@@ -1,0 +1,14 @@
+D:\sumita stellar\contracts\target\wasm32-unknown-unknown\release\deps\serde-d50c69a9ed39d17e.d: C:\Users\DEBDEEPA\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.229\src\lib.rs C:\Users\DEBDEEPA\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.229\src\integer128.rs C:\Users\DEBDEEPA\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.229\src\private\mod.rs C:\Users\DEBDEEPA\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.229\src\private\de.rs C:\Users\DEBDEEPA\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.229\src\private\ser.rs D:\sumita\ stellar\contracts\target\wasm32-unknown-unknown\release\build\serde-f4815d2509ec433a\out/private.rs
+
+D:\sumita stellar\contracts\target\wasm32-unknown-unknown\release\deps\libserde-d50c69a9ed39d17e.rlib: C:\Users\DEBDEEPA\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.229\src\lib.rs C:\Users\DEBDEEPA\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.229\src\integer128.rs C:\Users\DEBDEEPA\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.229\src\private\mod.rs C:\Users\DEBDEEPA\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.229\src\private\de.rs C:\Users\DEBDEEPA\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.229\src\private\ser.rs D:\sumita\ stellar\contracts\target\wasm32-unknown-unknown\release\build\serde-f4815d2509ec433a\out/private.rs
+
+D:\sumita stellar\contracts\target\wasm32-unknown-unknown\release\deps\libserde-d50c69a9ed39d17e.rmeta: C:\Users\DEBDEEPA\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.229\src\lib.rs C:\Users\DEBDEEPA\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.229\src\integer128.rs C:\Users\DEBDEEPA\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.229\src\private\mod.rs C:\Users\DEBDEEPA\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.229\src\private\de.rs C:\Users\DEBDEEPA\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.229\src\private\ser.rs D:\sumita\ stellar\contracts\target\wasm32-unknown-unknown\release\build\serde-f4815d2509ec433a\out/private.rs
+
+C:\Users\DEBDEEPA\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.229\src\lib.rs:
+C:\Users\DEBDEEPA\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.229\src\integer128.rs:
+C:\Users\DEBDEEPA\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.229\src\private\mod.rs:
+C:\Users\DEBDEEPA\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.229\src\private\de.rs:
+C:\Users\DEBDEEPA\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.229\src\private\ser.rs:
+D:\sumita\ stellar\contracts\target\wasm32-unknown-unknown\release\build\serde-f4815d2509ec433a\out/private.rs:
+
+# env-dep:OUT_DIR=D:\\sumita stellar\\contracts\\target\\wasm32-unknown-unknown\\release\\build\\serde-f4815d2509ec433a\\out
