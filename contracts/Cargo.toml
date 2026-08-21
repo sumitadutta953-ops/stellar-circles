@@ -1,0 +1,44 @@
+[workspace]
+resolver = "2"
+members = [
+    "passkey-wallet",
+    "passkey-wallet-interface",
+    "circle-factory",
+    "contribution",
+    "payout",
+    "default-handler",
+    "reputation"
+, "passkey-factory"]
+
+[workspace.package]
+version = "1.0.0"
+authors = ["Antigravity"]
+license = "Apache-2.0"
+edition = "2021"
+publish = false
+
+[workspace.dependencies]
+soroban-sdk = "27.0.0"
+serde = { version = "1.0", default-features = false }
+serde-json-core = { version = "0.6", default-features = false }
+ed25519-dalek = { version = "2.2" }
+p256 = { version = "0.13", features = ["ecdsa"] }
+sha2 = "0.10"
+base64 = "0.22"
+proptest = "1"
+stellar-strkey = { version = "0.0.13" }
+smart-wallet-interface = { path = "passkey-wallet-interface" }
+
+[profile.release]
+opt-level = "z"
+overflow-checks = true
+debug = 0
+strip = "symbols"
+debug-assertions = false
+panic = "abort"
+codegen-units = 1
+lto = true
+
+[profile.release-with-logs]
+inherits = "release"
+debug-assertions = true
