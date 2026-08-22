@@ -1,7 +1,7 @@
 #![no_std]
 use soroban_sdk::IntoVal;
 
-use soroban_sdk::{Address, Env, Symbol, Vec, contract, contractimpl, contracttype, symbol_short};
+use soroban_sdk::{Address, Env, Symbol, contract, contractimpl, contracttype};
 
 #[contracttype]
 #[derive(Clone, Debug, Eq, PartialEq)]

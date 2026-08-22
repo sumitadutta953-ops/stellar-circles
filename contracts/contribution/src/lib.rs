@@ -1,7 +1,7 @@
 #![no_std]
 use soroban_sdk::IntoVal;
 
-use soroban_sdk::{Address, Env, Symbol, Vec, contract, contractimpl, contracttype, symbol_short};
+use soroban_sdk::{Address, Env, Symbol, Vec, contract, contractimpl, contracttype};
 
 // We redefine CircleConfig here or import it if they were in a shared crate.
 // For simplicity we redefine it so we can parse the return value of get_circle_info.
@@ -126,7 +126,7 @@ impl ContributionContract {
         let token_client = token::Client::new(&env, &config.asset);
         token_client.transfer(
             &member,
-            &env.current_contract_address(),
+            env.current_contract_address(),
             &config.contribution_amount,
         );
 
@@ -237,7 +237,7 @@ impl ContributionContract {
             .persistent()
             .get(&DataKey::Members(circle_id))
             .unwrap_or_else(|| Vec::new(&env));
-        if members.len() > 0 {
+        if !members.is_empty() {
             use soroban_sdk::token;
             let token_client = token::Client::new(&env, &config.asset);
 

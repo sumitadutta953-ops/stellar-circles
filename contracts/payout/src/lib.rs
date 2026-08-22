@@ -1,7 +1,7 @@
 #![no_std]
 use soroban_sdk::IntoVal;
 
-use soroban_sdk::{Address, Env, Symbol, Vec, contract, contractimpl, contracttype, symbol_short};
+use soroban_sdk::{Address, Env, Symbol, Vec, contract, contractimpl, contracttype};
 
 #[contracttype]
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -70,7 +70,7 @@ impl PayoutContract {
 
         // Payout to the member whose index matches the current cycle (1-indexed)
         // For MVP, fixed payout order based on join order
-        let recipient_index = (current_cycle - 1) as u32;
+        let recipient_index = current_cycle - 1;
         let recipient = members
             .get(recipient_index)
             .expect("Invalid recipient index");
