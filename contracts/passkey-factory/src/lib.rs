@@ -1,8 +1,6 @@
 #![no_std]
 use smart_wallet_interface::types::{Signer, SignerExpiration, SignerLimits, SignerStorage};
-use soroban_sdk::{
-    contract, contractimpl, symbol_short, Address, Bytes, BytesN, Env, IntoVal, Symbol,
-};
+use soroban_sdk::{contract, contractimpl, symbol_short, Address, Bytes, BytesN, Env};
 
 #[contract]
 pub struct PasskeyFactory;
@@ -36,11 +34,8 @@ impl PasskeyFactory {
         );
 
         // Deploy the wallet, invoking its `__constructor` with the initial signer.
-        let deployed_address = env
-            .deployer()
+        env.deployer()
             .with_current_contract(salt)
-            .deploy_v2(wasm_hash, (signer,));
-
-        deployed_address
+            .deploy_v2(wasm_hash, (signer,))
     }
 }
