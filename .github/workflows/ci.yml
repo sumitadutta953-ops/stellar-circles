@@ -23,7 +23,7 @@ jobs:
       - name: Install Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: wasm32-unknown-unknown
+          targets: wasm32v1-none
           components: clippy, rustfmt
 
       - name: Cache Rust Dependencies
@@ -60,7 +60,7 @@ jobs:
       - name: Install Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: wasm32-unknown-unknown
+          targets: wasm32v1-none
 
       - name: Cache Rust Dependencies
         uses: Swatinem/rust-cache@v2
@@ -68,7 +68,7 @@ jobs:
           workspaces: ./contracts -> target
 
       - name: Build WASM
-        run: cargo build --target wasm32-unknown-unknown --release
+        run: cargo build --target wasm32v1-none --release
 
       - name: Run Tests
         run: cargo test --workspace
