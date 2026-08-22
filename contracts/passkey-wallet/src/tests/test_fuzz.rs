@@ -75,7 +75,7 @@ proptest! {
         client_data_json in proptest::collection::vec(any::<u8>(), 0..1200),
         signature in proptest::collection::vec(any::<u8>(), 64..=64),
     ) {
-        let signature: [u8; 64] = signature.into();
+        let signature: [u8; 64] = signature.try_into().unwrap();
         let result = check_raw(&authenticator_data, &client_data_json, &signature);
         prop_assert!(result.is_err(), "arbitrary input must never authorize: {result:?}");
     }

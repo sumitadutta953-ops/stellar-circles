@@ -110,7 +110,7 @@ fn ed25519_with_policy_limits_full_stack() {
     let root_invocation = SorobanAuthorizedInvocation {
         function: SorobanAuthorizedFunction::ContractFn(InvokeContractArgs {
             contract_address: example_contract_address.clone().into(),
-            function_name: "call".into(),
+            function_name: "call".try_into().unwrap(),
             args: std::vec![
                 sac_address.clone().into(),
                 wallet_address.clone().into(),
