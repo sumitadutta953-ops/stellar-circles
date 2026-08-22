@@ -1384,7 +1384,7 @@ fn sole_rejecting_policy_self_removal_blocked_by_backstop() {
     let root_auth = soroban_sdk::xdr::SorobanAuthorizationEntry {
         credentials: soroban_sdk::xdr::SorobanCredentials::Address(
             soroban_sdk::xdr::SorobanAddressCredentials {
-                address: wallet.clone().try_into().unwrap(),
+                address: wallet.clone().into(),
                 nonce,
                 signature_expiration_ledger,
                 signature: Signatures(map![&env, (policy_key.clone(), Signature::Policy)])
@@ -1482,7 +1482,7 @@ fn rejecting_policy_self_removal_full_stack() {
     let root_auth = soroban_sdk::xdr::SorobanAuthorizationEntry {
         credentials: soroban_sdk::xdr::SorobanCredentials::Address(
             soroban_sdk::xdr::SorobanAddressCredentials {
-                address: wallet.clone().try_into().unwrap(),
+                address: wallet.clone().into(),
                 nonce,
                 signature_expiration_ledger,
                 signature: Signatures(map![&env, (policy_key.clone(), Signature::Policy)])
@@ -1551,7 +1551,7 @@ fn sole_admin_capable_policy_cannot_self_remove() {
     let root_auth = soroban_sdk::xdr::SorobanAuthorizationEntry {
         credentials: soroban_sdk::xdr::SorobanCredentials::Address(
             soroban_sdk::xdr::SorobanAddressCredentials {
-                address: wallet.clone().try_into().unwrap(),
+                address: wallet.clone().into(),
                 nonce,
                 signature_expiration_ledger,
                 signature: Signatures(map![&env, (policy_key.clone(), Signature::Policy)])

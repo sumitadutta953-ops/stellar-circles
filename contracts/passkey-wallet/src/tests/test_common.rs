@@ -302,15 +302,11 @@ pub fn transfer_invocation(
 ) -> SorobanAuthorizedInvocation {
     SorobanAuthorizedInvocation {
         function: SorobanAuthorizedFunction::ContractFn(InvokeContractArgs {
-            contract_address: token.clone().try_into().unwrap(),
-            function_name: "transfer".try_into().unwrap(),
-            args: std::vec![
-                from.clone().try_into().unwrap(),
-                to.clone().try_into().unwrap(),
-                amount.try_into().unwrap(),
-            ]
-            .try_into()
-            .unwrap(),
+            contract_address: token.clone().into(),
+            function_name: "transfer".into(),
+            args: std::vec![from.clone().into(), to.clone().into(), amount.into(),]
+                .try_into()
+                .unwrap(),
         }),
         sub_invocations: VecM::default(),
     }
@@ -328,9 +324,9 @@ pub fn remove_signer_invocation(
 
     SorobanAuthorizedInvocation {
         function: SorobanAuthorizedFunction::ContractFn(InvokeContractArgs {
-            contract_address: wallet.clone().try_into().unwrap(),
-            function_name: "remove_signer".try_into().unwrap(),
-            args: std::vec![key_scval].try_into().unwrap(),
+            contract_address: wallet.clone().into(),
+            function_name: "remove_signer".into(),
+            args: std::vec![key_scval].into(),
         }),
         sub_invocations: VecM::default(),
     }

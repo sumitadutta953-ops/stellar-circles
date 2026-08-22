@@ -978,7 +978,7 @@ fn last_admin_self_removal_fails_at_execution() {
     let root_auth = soroban_sdk::xdr::SorobanAuthorizationEntry {
         credentials: soroban_sdk::xdr::SorobanCredentials::Address(
             soroban_sdk::xdr::SorobanAddressCredentials {
-                address: wallet.clone().try_into().unwrap(),
+                address: wallet.clone().into(),
                 nonce,
                 signature_expiration_ledger,
                 signature: Signatures(soroban_sdk::map![
@@ -1269,7 +1269,7 @@ fn sole_self_cosigner_signer_cannot_self_remove() {
     let root_auth = soroban_sdk::xdr::SorobanAuthorizationEntry {
         credentials: soroban_sdk::xdr::SorobanCredentials::Address(
             soroban_sdk::xdr::SorobanAddressCredentials {
-                address: wallet.clone().try_into().unwrap(),
+                address: wallet.clone().into(),
                 nonce,
                 signature_expiration_ledger,
                 signature: Signatures(map![&env, (key.clone(), a.sign(&env, &payload))])
@@ -1305,6 +1305,7 @@ fn every_sole_signer_shape_last_removal_rejected() {
     let a = Ed25519Signer::new(1);
 
     // (limits-builder, expected error) per shape. Built per-env below.
+    #[allow(clippy::type_complexity)]
     let cases: std::vec::Vec<(
         &str,
         fn(&Env, &Address, &Ed25519Signer) -> SignerLimits,
