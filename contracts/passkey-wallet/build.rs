@@ -23,7 +23,7 @@ fn main() {
             "--package",
             "sample-policy",
             "--package",
-            "smart-wallet",
+            "passkey-wallet",
             "--target",
             "wasm32v1-none",
             "--release",
@@ -40,8 +40,9 @@ fn main() {
     let release = fixture_target.join("wasm32v1-none").join("release");
     let fixtures = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap()).join("fixtures");
     std::fs::create_dir_all(&fixtures).unwrap();
-    for wasm in ["sample_policy.wasm", "smart_wallet.wasm"] {
-        std::fs::copy(release.join(wasm), fixtures.join(wasm))
+    for wasm in ["sample_policy.wasm", "passkey_wallet.wasm"] {
+        let dest_wasm = if wasm == "passkey_wallet.wasm" { "smart_wallet.wasm" } else { wasm };
+        std::fs::copy(release.join(wasm), fixtures.join(dest_wasm))
             .unwrap_or_else(|e| panic!("copying fixture {wasm}: {e}"));
     }
 

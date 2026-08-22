@@ -7,8 +7,10 @@ members = [
     "contribution",
     "payout",
     "default-handler",
-    "reputation"
-, "passkey-factory"]
+    "reputation",
+    "sample-policy",
+    "passkey-factory"
+]
 
 [workspace.package]
 version = "1.0.0"
