@@ -159,5 +159,8 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps chromium
 
+      - name: Build Application for Preview
+        run: npm run build
+
       - name: Run Playwright Tests
         run: npx playwright test
