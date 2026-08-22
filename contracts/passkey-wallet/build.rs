@@ -24,6 +24,8 @@ fn main() {
             "sample-policy",
             "--package",
             "passkey-wallet",
+            "--package",
+            "example-contract",
             "--target",
             "wasm32v1-none",
             "--release",
@@ -40,17 +42,17 @@ fn main() {
     let release = fixture_target.join("wasm32v1-none").join("release");
     let fixtures = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap()).join("fixtures");
     std::fs::create_dir_all(&fixtures).unwrap();
-    for wasm in ["sample_policy.wasm", "passkey_wallet.wasm"] {
-        let dest_wasm = if wasm == "passkey_wallet.wasm" {
-            "smart_wallet.wasm"
-        } else {
-            wasm
-        };
-        std::fs::copy(release.join(wasm), fixtures.join(dest_wasm))
-            .unwrap_or_else(|e| panic!("copying fixture {wasm}: {e}"));
+    for (src, dest) in [
+        ("sample_policy.wasm", "sample_policy.wasm"),
+        ("passkey_wallet.wasm", "smart_wallet.wasm"),
+        ("example_contract.wasm", "example_contract.wasm"),
+    ] {
+        std::fs::copy(release.join(src), fixtures.join(dest))
+            .unwrap_or_else(|e| panic!("copying fixture {src}: {e}"));
     }
 
     println!("cargo:rerun-if-changed=src");
     println!("cargo:rerun-if-changed=../sample-policy/src");
+    println!("cargo:rerun-if-changed=../example-contract/src");
     println!("cargo:rerun-if-changed=../smart-wallet-interface/src");
 }

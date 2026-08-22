@@ -9,6 +9,7 @@ members = [
     "default-handler",
     "reputation",
     "sample-policy",
+    "example-contract",
     "passkey-factory"
 ]
 
