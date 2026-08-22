@@ -455,7 +455,7 @@ export const CircleDashboard: React.FC<{ walletAddress: string }> = ({ walletAdd
                     {(() => {
                       const sortedMembers = Object.values(activeCircle.memberProfiles || {}).sort((a, b) => new Date(a.joinedAt || 0).getTime() - new Date(b.joinedAt || 0).getTime());
                       return sortedMembers.map((member, index) => {
-                        const hasPaid = activeCircle.contributions?.[activeCircle.currentCycle]?.includes(member.address);
+                        const hasPaid = activeCircle.contributions?.[activeCircle.currentCycle]?.includes(member.address!);
                         const isMe = member.address === walletAddress;
                         const isRecipient = index === activeCircle.currentCycle - 1;
                         return (
@@ -484,7 +484,7 @@ export const CircleDashboard: React.FC<{ walletAddress: string }> = ({ walletAdd
                                 {(member.name || 'M').charAt(0).toUpperCase()}
                               </div>
                               <div>
-                                <span style={{ fontWeight: 600 }}>{member.name || `${member.address.substring(0,6)}...`}</span>
+                                <span style={{ fontWeight: 600 }}>{member.name || `${member.address!.substring(0,6)}...`}</span>
                                 {isMe && (
                                   <span style={{ marginLeft: 'var(--space-2)', fontSize: 'var(--text-xs)', background: 'rgba(139,92,246,0.2)', color: 'var(--color-primary-hover)', padding: '1px 6px', borderRadius: '99px' }}>You</span>
                                 )}

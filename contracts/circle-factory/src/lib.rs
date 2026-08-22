@@ -1,5 +1,5 @@
 #![no_std]
-use soroban_sdk::{contract, contractimpl, contracttype, symbol_short, Address, Env, Symbol};
+use soroban_sdk::{Address, Env, Symbol, contract, contractimpl, contracttype, symbol_short};
 
 #[contracttype]
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -14,9 +14,9 @@ pub struct CircleConfig {
 
 #[contracttype]
 pub enum DataKey {
-    Config(u64),      // circle_id -> CircleConfig
-    CircleCount,      // u64
-    Admin,            // Address
+    Config(u64), // circle_id -> CircleConfig
+    CircleCount, // u64
+    Admin,       // Address
 }
 
 #[contract]
@@ -39,7 +39,11 @@ impl CircleFactory {
     ) -> u64 {
         organizer.require_auth();
 
-        let mut count: u64 = env.storage().instance().get(&DataKey::CircleCount).unwrap_or(0);
+        let mut count: u64 = env
+            .storage()
+            .instance()
+            .get(&DataKey::CircleCount)
+            .unwrap_or(0);
         count += 1;
 
         let config = CircleConfig {
@@ -51,7 +55,9 @@ impl CircleFactory {
             is_active: true,
         };
 
-        env.storage().persistent().set(&DataKey::Config(count), &config);
+        env.storage()
+            .persistent()
+            .set(&DataKey::Config(count), &config);
         env.storage().instance().set(&DataKey::CircleCount, &count);
 
         count
@@ -66,16 +72,22 @@ impl CircleFactory {
 
     pub fn set_inactive(env: Env, circle_id: u64, caller: Address) {
         caller.require_auth();
-        
-        let mut config: CircleConfig = env.storage()
+
+        let mut config: CircleConfig = env
+            .storage()
             .persistent()
             .get(&DataKey::Config(circle_id))
             .expect("Circle not found");
-            
-        assert!(caller == config.organizer, "Only the organizer can deactivate the circle");
+
+        assert!(
+            caller == config.organizer,
+            "Only the organizer can deactivate the circle"
+        );
         assert!(config.is_active, "Circle is already inactive");
-        
+
         config.is_active = false;
-        env.storage().persistent().set(&DataKey::Config(circle_id), &config);
+        env.storage()
+            .persistent()
+            .set(&DataKey::Config(circle_id), &config);
     }
 }

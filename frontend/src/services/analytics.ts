@@ -15,7 +15,7 @@ export function initAnalytics() {
     }
 
     // PostHog initialization mock
-    console.log(`PostHog initialized at ${POSTHOG_HOST}`);
+    console.log(`PostHog initialized at ${POSTHOG_HOST} with key ${POSTHOG_KEY}`);
   }
 }
 

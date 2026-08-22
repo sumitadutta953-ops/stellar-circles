@@ -1,5 +1,5 @@
 import * as StellarSdk from '@stellar/stellar-sdk';
-import { signTransaction, signAuthEntry, getPublicKey } from '@stellar/freighter-api';
+import { signTransaction } from '@stellar/freighter-api';
 
 const rpcUrl = 'https://soroban-testnet.stellar.org';
 const networkPassphrase = StellarSdk.Networks.TESTNET;
@@ -54,7 +54,7 @@ export async function submitTransaction(
          // Reconstruct the transaction if auth entries were mutated
          const env = StellarSdk.xdr.TransactionEnvelope.envelopeTypeTx(
            new StellarSdk.xdr.TransactionV1Envelope({
-             tx: innerTx,
+             tx: innerTx as any,
              signatures: []
            })
          );
@@ -88,7 +88,7 @@ export async function submitTransaction(
 
   if (sendResponse.status === 'ERROR') {
     throw new Error(
-      `Transaction failed: ${sendResponse.errorResultXdr || JSON.stringify((sendResponse as any).errorResult) || sendResponse.hash}`
+      `Transaction failed: ${(sendResponse as any).errorResultXdr || JSON.stringify((sendResponse as any).errorResult) || sendResponse.hash}`
     );
   }
 
@@ -123,7 +123,7 @@ export async function getNativeBalance(publicKey: string): Promise<string> {
     const account = await horizon.loadAccount(publicKey);
     const nativeBalance = account.balances.find(b => b.asset_type === 'native');
     return nativeBalance ? nativeBalance.balance : '0';
-  } catch (e) {
+  } catch (_e) {
     return '0';
   }
 }

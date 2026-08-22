@@ -1,9 +1,7 @@
 #![no_std]
 use soroban_sdk::IntoVal;
 
-use soroban_sdk::{
-    contract, contractimpl, contracttype, symbol_short, Address, Env, Symbol, Vec,
-};
+use soroban_sdk::{Address, Env, Symbol, Vec, contract, contractimpl, contracttype, symbol_short};
 
 // We redefine CircleConfig here or import it if they were in a shared crate.
 // For simplicity we redefine it so we can parse the return value of get_circle_info.
@@ -50,7 +48,7 @@ impl ContributionContract {
             &Symbol::new(&env, "get_circle_info"),
             (circle_id,).into_val(&env),
         );
-        
+
         assert!(config.is_active, "Circle is not active");
 
         let mut members: Vec<Address> = env
@@ -63,19 +61,29 @@ impl ContributionContract {
         assert!(!members.contains(&member), "Already a member");
 
         members.push_back(member);
-        env.storage().persistent().set(&DataKey::Members(circle_id), &members);
+        env.storage()
+            .persistent()
+            .set(&DataKey::Members(circle_id), &members);
 
         // If circle is now full, start Cycle 1
         if members.len() == config.member_cap {
-            env.storage().persistent().set(&DataKey::CurrentCycle(circle_id), &1u32);
-            env.storage().persistent().set(&DataKey::CycleStart(circle_id), &env.ledger().timestamp());
+            env.storage()
+                .persistent()
+                .set(&DataKey::CurrentCycle(circle_id), &1u32);
+            env.storage()
+                .persistent()
+                .set(&DataKey::CycleStart(circle_id), &env.ledger().timestamp());
         }
     }
 
     pub fn contribute(env: Env, circle_id: u64, member: Address) {
         member.require_auth();
 
-        let current_cycle: u32 = env.storage().persistent().get(&DataKey::CurrentCycle(circle_id)).expect("Circle not started");
+        let current_cycle: u32 = env
+            .storage()
+            .persistent()
+            .get(&DataKey::CurrentCycle(circle_id))
+            .expect("Circle not started");
         assert!(current_cycle > 0, "Circle not started");
 
         let factory: Address = env.storage().instance().get(&DataKey::Factory).unwrap();
@@ -85,37 +93,65 @@ impl ContributionContract {
             (circle_id,).into_val(&env),
         );
 
-        let cycle_start: u64 = env.storage().persistent().get(&DataKey::CycleStart(circle_id)).unwrap();
+        let cycle_start: u64 = env
+            .storage()
+            .persistent()
+            .get(&DataKey::CycleStart(circle_id))
+            .unwrap();
         let now = env.ledger().timestamp();
-        assert!(now <= cycle_start + config.cycle_length_seconds, "Cycle deadline missed");
+        assert!(
+            now <= cycle_start + config.cycle_length_seconds,
+            "Cycle deadline missed"
+        );
 
         // Verify member is in circle
-        let members: Vec<Address> = env.storage().persistent().get(&DataKey::Members(circle_id)).unwrap();
+        let members: Vec<Address> = env
+            .storage()
+            .persistent()
+            .get(&DataKey::Members(circle_id))
+            .unwrap();
         assert!(members.contains(&member), "Not a member");
 
         // Mark as contributed
         let contribution_key = DataKey::Contribution(circle_id, current_cycle, member.clone());
-        let already_contributed: bool = env.storage().persistent().get(&contribution_key).unwrap_or(false);
+        let already_contributed: bool = env
+            .storage()
+            .persistent()
+            .get(&contribution_key)
+            .unwrap_or(false);
         assert!(!already_contributed, "Already contributed this cycle");
 
         // Transfer funds from member to this contract
         use soroban_sdk::token;
         let token_client = token::Client::new(&env, &config.asset);
-        token_client.transfer(&member, &env.current_contract_address(), &config.contribution_amount);
+        token_client.transfer(
+            &member,
+            &env.current_contract_address(),
+            &config.contribution_amount,
+        );
 
         env.storage().persistent().set(&contribution_key, &true);
     }
 
     pub fn get_current_cycle(env: Env, circle_id: u64) -> u32 {
-        env.storage().persistent().get(&DataKey::CurrentCycle(circle_id)).unwrap_or(0)
+        env.storage()
+            .persistent()
+            .get(&DataKey::CurrentCycle(circle_id))
+            .unwrap_or(0)
     }
 
     pub fn get_members(env: Env, circle_id: u64) -> Vec<Address> {
-        env.storage().persistent().get(&DataKey::Members(circle_id)).unwrap_or_else(|| Vec::new(&env))
+        env.storage()
+            .persistent()
+            .get(&DataKey::Members(circle_id))
+            .unwrap_or_else(|| Vec::new(&env))
     }
 
     pub fn has_contributed(env: Env, circle_id: u64, cycle: u32, member: Address) -> bool {
-        env.storage().persistent().get(&DataKey::Contribution(circle_id, cycle, member)).unwrap_or(false)
+        env.storage()
+            .persistent()
+            .get(&DataKey::Contribution(circle_id, cycle, member))
+            .unwrap_or(false)
     }
 
     pub fn execute_payout(env: Env, circle_id: u64, recipient: Address, amount: i128) {
@@ -134,23 +170,40 @@ impl ContributionContract {
         token_client.transfer(&env.current_contract_address(), &recipient, &amount);
 
         // Advance to next cycle
-        let current_cycle: u32 = env.storage().persistent().get(&DataKey::CurrentCycle(circle_id)).unwrap();
+        let current_cycle: u32 = env
+            .storage()
+            .persistent()
+            .get(&DataKey::CurrentCycle(circle_id))
+            .unwrap();
         if current_cycle < config.member_cap {
-            env.storage().persistent().set(&DataKey::CurrentCycle(circle_id), &(current_cycle + 1));
-            env.storage().persistent().set(&DataKey::CycleStart(circle_id), &env.ledger().timestamp());
+            env.storage()
+                .persistent()
+                .set(&DataKey::CurrentCycle(circle_id), &(current_cycle + 1));
+            env.storage()
+                .persistent()
+                .set(&DataKey::CycleStart(circle_id), &env.ledger().timestamp());
         }
     }
 
     pub fn get_cycle_start(env: Env, circle_id: u64) -> u64 {
-        env.storage().persistent().get(&DataKey::CycleStart(circle_id)).unwrap_or(0)
+        env.storage()
+            .persistent()
+            .get(&DataKey::CycleStart(circle_id))
+            .unwrap_or(0)
     }
 
     pub fn kick_member(env: Env, circle_id: u64, member: Address) {
         // Assume caller authorization is verified (e.g. called by DefaultHandler)
-        let mut members: Vec<Address> = env.storage().persistent().get(&DataKey::Members(circle_id)).unwrap();
+        let mut members: Vec<Address> = env
+            .storage()
+            .persistent()
+            .get(&DataKey::Members(circle_id))
+            .unwrap();
         if let Some(index) = members.iter().position(|m| m == member) {
             members.remove(index as u32);
-            env.storage().persistent().set(&DataKey::Members(circle_id), &members);
+            env.storage()
+                .persistent()
+                .set(&DataKey::Members(circle_id), &members);
         }
     }
 
@@ -158,14 +211,17 @@ impl ContributionContract {
         caller.require_auth();
 
         let factory: Address = env.storage().instance().get(&DataKey::Factory).unwrap();
-        
+
         let config: CircleConfig = env.invoke_contract(
             &factory,
             &Symbol::new(&env, "get_circle_info"),
             (circle_id,).into_val(&env),
         );
 
-        assert!(caller == config.organizer, "Only the organizer can delete the circle");
+        assert!(
+            caller == config.organizer,
+            "Only the organizer can delete the circle"
+        );
         assert!(config.is_active, "Circle is already deleted");
 
         // Deactivate via factory
@@ -176,21 +232,29 @@ impl ContributionContract {
         );
 
         // Refund equally
-        let members: Vec<Address> = env.storage().persistent().get(&DataKey::Members(circle_id)).unwrap_or_else(|| Vec::new(&env));
+        let members: Vec<Address> = env
+            .storage()
+            .persistent()
+            .get(&DataKey::Members(circle_id))
+            .unwrap_or_else(|| Vec::new(&env));
         if members.len() > 0 {
             use soroban_sdk::token;
             let token_client = token::Client::new(&env, &config.asset);
-            
+
             // Check balance of this contract
             let balance = token_client.balance(&env.current_contract_address());
-            
+
             if balance > 0 {
                 // Distribute equally
                 let amount_per_member = balance / (members.len() as i128);
-                
+
                 if amount_per_member > 0 {
                     for member in members.iter() {
-                        token_client.transfer(&env.current_contract_address(), &member, &amount_per_member);
+                        token_client.transfer(
+                            &env.current_contract_address(),
+                            &member,
+                            &amount_per_member,
+                        );
                     }
                 }
             }
@@ -228,11 +292,7 @@ impl ContributionContract {
         if members.len() == 1 {
             // Last member leaving — return the entire remaining vault to them
             if vault_balance > 0 {
-                token_client.transfer(
-                    &env.current_contract_address(),
-                    &member,
-                    &vault_balance,
-                );
+                token_client.transfer(&env.current_contract_address(), &member, &vault_balance);
             }
         } else {
             // Refund only their current-cycle contribution if they already paid it
@@ -272,5 +332,3 @@ impl ContributionContract {
         }
     }
 }
-
-

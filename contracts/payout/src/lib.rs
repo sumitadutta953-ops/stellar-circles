@@ -1,9 +1,7 @@
 #![no_std]
 use soroban_sdk::IntoVal;
 
-use soroban_sdk::{
-    contract, contractimpl, contracttype, symbol_short, Address, Env, Symbol, Vec,
-};
+use soroban_sdk::{Address, Env, Symbol, Vec, contract, contractimpl, contracttype, symbol_short};
 
 #[contracttype]
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -29,12 +27,18 @@ pub struct PayoutContract;
 impl PayoutContract {
     pub fn init(env: Env, factory: Address, contribution_contract: Address) {
         env.storage().instance().set(&DataKey::Factory, &factory);
-        env.storage().instance().set(&DataKey::ContributionContract, &contribution_contract);
+        env.storage()
+            .instance()
+            .set(&DataKey::ContributionContract, &contribution_contract);
     }
 
     pub fn trigger_payout(env: Env, circle_id: u64) {
         let factory: Address = env.storage().instance().get(&DataKey::Factory).unwrap();
-        let contribution: Address = env.storage().instance().get(&DataKey::ContributionContract).unwrap();
+        let contribution: Address = env
+            .storage()
+            .instance()
+            .get(&DataKey::ContributionContract)
+            .unwrap();
 
         let config: CircleConfig = env.invoke_contract(
             &factory,
@@ -67,7 +71,9 @@ impl PayoutContract {
         // Payout to the member whose index matches the current cycle (1-indexed)
         // For MVP, fixed payout order based on join order
         let recipient_index = (current_cycle - 1) as u32;
-        let recipient = members.get(recipient_index).expect("Invalid recipient index");
+        let recipient = members
+            .get(recipient_index)
+            .expect("Invalid recipient index");
 
         let total_payout = config.contribution_amount * (config.member_cap as i128);
 
@@ -82,4 +88,3 @@ impl PayoutContract {
         );
     }
 }
-

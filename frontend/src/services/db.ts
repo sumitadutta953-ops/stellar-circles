@@ -15,9 +15,11 @@ const app = initializeApp(firebaseConfig);
 const firestore = getFirestore(app);
 
 export interface UserProfile {
-  id: string;
+  id?: string;
   name: string;
-  reputationScore: number;
+  reputationScore?: number;
+  address?: string;
+  joinedAt?: string;
 }
 
 export interface CircleMetadata {
@@ -100,7 +102,7 @@ class FirestoreDB {
   }
 
   async saveUser(profile: UserProfile): Promise<void> {
-    const docRef = doc(firestore, "users", profile.id);
+    const docRef = doc(firestore, "users", profile.id!);
     await setDoc(docRef, profile, { merge: true });
   }
 }

@@ -1,9 +1,7 @@
 #![no_std]
 use soroban_sdk::IntoVal;
 
-use soroban_sdk::{
-    contract, contractimpl, contracttype, Address, Env, Symbol, Vec, symbol_short,
-};
+use soroban_sdk::{Address, Env, Symbol, Vec, contract, contractimpl, contracttype, symbol_short};
 
 #[contracttype]
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -31,12 +29,18 @@ pub struct DefaultHandlerContract;
 impl DefaultHandlerContract {
     pub fn init(env: Env, factory: Address, contribution_contract: Address) {
         env.storage().instance().set(&DataKey::Factory, &factory);
-        env.storage().instance().set(&DataKey::ContributionContract, &contribution_contract);
+        env.storage()
+            .instance()
+            .set(&DataKey::ContributionContract, &contribution_contract);
     }
 
     pub fn flag_default(env: Env, circle_id: u64, defaulting_member: Address) {
         let factory: Address = env.storage().instance().get(&DataKey::Factory).unwrap();
-        let contribution: Address = env.storage().instance().get(&DataKey::ContributionContract).unwrap();
+        let contribution: Address = env
+            .storage()
+            .instance()
+            .get(&DataKey::ContributionContract)
+            .unwrap();
 
         let config: CircleConfig = env.invoke_contract(
             &factory,
@@ -79,4 +83,3 @@ impl DefaultHandlerContract {
         );
     }
 }
-
