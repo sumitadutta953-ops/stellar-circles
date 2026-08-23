@@ -46,9 +46,11 @@ export async function createPasskeyCredential(): Promise<string> {
       { alg: -257, type: "public-key" } // RS256
     ],
     authenticatorSelection: {
-      authenticatorAttachment: "platform", // Use THIS device — Face ID, fingerprint, Windows Hello etc.
-      residentKey: "preferred",            // Store credential on-device (enables autofill)
-      userVerification: "required"         // Always require biometric/PIN confirmation
+      // Do NOT restrict authenticatorAttachment — let the browser/OS decide.
+      // On Windows: shows Windows Hello + "scan with phone" QR option (like Google/GitHub)
+      // On mobile: defaults to Face ID / fingerprint on the device itself
+      residentKey: "preferred",   // Store on-device for faster re-auth
+      userVerification: "required" // Always require biometric or PIN
     },
     timeout: 60000,
     attestation: "none"
@@ -71,11 +73,11 @@ export async function authenticatePasskey(credentialId: string): Promise<boolean
 
   const publicKeyCredentialRequestOptions: PublicKeyCredentialRequestOptions = {
     challenge,
-    rpId: window.location.hostname, // Must match the device that created the passkey
+    rpId: window.location.hostname,
     allowCredentials: [{
       id: base64urlToBuffer(credentialId),
       type: 'public-key',
-      transports: ['internal'], // "internal" = on-device biometric (not USB, NFC, or BLE)
+      // No transports restriction — works with platform biometric AND phone QR scan
     }],
     userVerification: "required",
     timeout: 60000,
