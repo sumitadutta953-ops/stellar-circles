@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, NavLink } from 'react-router-dom';
 import { WalletConnect } from './components/WalletConnect';
 import { initAnalytics } from './services/analytics';
 import { CircleCreation } from './pages/CircleCreation';
@@ -22,70 +22,123 @@ function App() {
     setWallet({ address, method, balance });
   };
 
-  // Auto-refresh balance every 15 seconds when wallet is connected
   useEffect(() => {
     if (!wallet?.address) return;
-    const interval = setInterval(() => {
-      refreshBalance(wallet.address);
-    }, 15000);
-    return () => clearInterval(interval);
+    const id = setInterval(() => refreshBalance(wallet.address), 15000);
+    return () => clearInterval(id);
   }, [wallet?.address, refreshBalance]);
 
-  useEffect(() => {
-    initAnalytics();
-  }, []);
+  useEffect(() => { initAnalytics(); }, []);
+
+  const short = (addr: string) => `${addr.slice(0, 4)}…${addr.slice(-4)}`;
+
+  /* ── No wallet → fullscreen onboarding ── */
+  if (!wallet) {
+    return (
+      <Router>
+        <WalletConnect onConnect={handleConnect} />
+      </Router>
+    );
+  }
 
   return (
     <Router>
-      <div className="container" style={{ paddingTop: 'var(--space-12)' }}>
-        <header style={{ marginBottom: 'var(--space-8)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div>
-            <h1 className="text-gradient" style={{ fontSize: 'var(--text-3xl)', fontWeight: 700, margin: 0 }}>
-              Stellar Circles
-            </h1>
-            <p className="text-muted" style={{ margin: 0, fontSize: 'var(--text-sm)' }}>Decentralized Rotating Savings</p>
+      {/* ────────── STICKY HEADER ────────── */}
+      <header style={{
+        position: 'sticky', top: 0, zIndex: 100,
+        background: 'rgba(3,6,15,0.88)',
+        backdropFilter: 'blur(18px)',
+        WebkitBackdropFilter: 'blur(18px)',
+        borderBottom: '1px solid var(--c-border)',
+        height: 'var(--header-h)',
+      }}>
+        <div className="container" style={{
+          height: '100%', display: 'flex',
+          alignItems: 'center', justifyContent: 'space-between', gap: 12,
+        }}>
+          {/* Logo */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+            <div style={{
+              width: 34, height: 34, borderRadius: '50%',
+              background: 'linear-gradient(135deg, #6366F1 0%, #A78BFA 100%)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 17, color: '#fff', fontWeight: 700,
+            }}>◎</div>
+            <span style={{
+              fontWeight: 700, fontSize: 'var(--text-base)',
+              letterSpacing: '-0.03em', color: 'var(--c-text)',
+            }}>
+              Stellar<span style={{ color: 'var(--c-purple)' }}>Circles</span>
+            </span>
           </div>
-          {wallet && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
-              <span className="text-muted" style={{ fontSize: 'var(--text-sm)' }}>
-                <strong style={{ color: 'var(--color-primary-hover)' }}>{parseFloat(wallet.balance).toFixed(2)} XLM</strong>
-                <span style={{ opacity: 0.5, margin: '0 var(--space-2)' }}>|</span>
-                {wallet.method === 'passkey' ? 'Passkey' : 'Freighter'}: {wallet.address}
-              </span>
-              <button
-                className="btn btn-secondary"
-                style={{ padding: 'var(--space-1) var(--space-3)', fontSize: 'var(--text-xs)' }}
-                onClick={() => refreshBalance(wallet.address)}
-                title="Refresh balance"
-              >
-                🔄
-              </button>
-              <button
-                className="btn btn-secondary"
-                style={{ padding: 'var(--space-1) var(--space-3)', fontSize: 'var(--text-xs)' }}
-                onClick={() => setWallet(null)}
-              >
-                Disconnect
-              </button>
-            </div>
-          )}
-        </header>
 
-        <main>
-          {!wallet ? (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
-              <WalletConnect onConnect={handleConnect} />
+          {/* Wallet row */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            {/* Balance pill */}
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 8,
+              background: 'var(--c-surface-2)',
+              border: '1px solid var(--c-border)',
+              borderRadius: 'var(--border-radius-full)',
+              padding: '6px 14px',
+            }}>
+              <div style={{
+                width: 7, height: 7, borderRadius: '50%',
+                background: 'var(--c-success)',
+                animation: 'glow-pulse 2.5s ease-in-out infinite',
+              }} />
+              <span style={{ fontWeight: 700, fontSize: 'var(--text-sm)' }}>
+                {parseFloat(wallet.balance).toFixed(2)}&nbsp;XLM
+              </span>
+              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--c-text-muted)' }}
+                className="desktop-only"
+              >{short(wallet.address)}</span>
             </div>
-          ) : (
-            <Routes>
-              <Route path="/" element={<CircleDashboard walletAddress={wallet.address} onTransactionComplete={() => refreshBalance(wallet.address)} />} />
-              <Route path="/create" element={<CircleCreation walletAddress={wallet.address} onTransactionComplete={() => refreshBalance(wallet.address)} />} />
-              <Route path="/join" element={<JoinCircle walletAddress={wallet.address} onTransactionComplete={() => refreshBalance(wallet.address)} />} />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          )}
-        </main>
-      </div>
+
+            {/* Refresh */}
+            <button className="btn btn-ghost" onClick={() => refreshBalance(wallet.address)}
+              title="Refresh balance"
+              style={{ padding: 8, borderRadius: 'var(--border-radius-md)', fontSize: 16 }}>
+              ⟳
+            </button>
+
+            {/* Sign out — desktop only, mobile uses bottom nav */}
+            <button
+              className="btn btn-secondary desktop-only"
+              style={{ padding: '6px 14px', fontSize: 'var(--text-xs)' }}
+              onClick={() => setWallet(null)}
+            >
+              Sign out
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* ────────── MAIN CONTENT ────────── */}
+      <main
+        className="container page-pad-bottom"
+        style={{ paddingTop: 'var(--space-6)', minHeight: 'calc(100vh - var(--header-h))' }}
+      >
+        <Routes>
+          <Route path="/"       element={<CircleDashboard walletAddress={wallet.address} onTransactionComplete={() => refreshBalance(wallet.address)} />} />
+          <Route path="/create" element={<CircleCreation  walletAddress={wallet.address} onTransactionComplete={() => refreshBalance(wallet.address)} />} />
+          <Route path="/join"   element={<JoinCircle      walletAddress={wallet.address} onTransactionComplete={() => refreshBalance(wallet.address)} />} />
+          <Route path="*"       element={<Navigate to="/" replace />} />
+        </Routes>
+      </main>
+
+      {/* ────────── MOBILE BOTTOM NAV ────────── */}
+      <nav className="mobile-nav">
+        <div className="mobile-nav-inner">
+          <NavLink to="/" end className={({ isActive }) => `nav-tab${isActive ? ' active' : ''}`}>
+            <span>⊙</span><span>Circles</span>
+          </NavLink>
+          <NavLink to="/create" className="nav-fab" title="Create circle">＋</NavLink>
+          <NavLink to="/join" className={({ isActive }) => `nav-tab${isActive ? ' active' : ''}`}>
+            <span>↗</span><span>Join</span>
+          </NavLink>
+        </div>
+      </nav>
     </Router>
   );
 }
