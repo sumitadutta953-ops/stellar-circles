@@ -4,7 +4,7 @@ import { trackEvent, captureError } from '../services/analytics';
 import { db } from '../services/db';
 import '../styles/index.css';
 
-export const CircleCreation: React.FC<{ walletAddress: string }> = ({ walletAddress }) => {
+export const CircleCreation: React.FC<{ walletAddress: string; onTransactionComplete?: () => void }> = ({ walletAddress, onTransactionComplete }) => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
@@ -108,6 +108,7 @@ export const CircleCreation: React.FC<{ walletAddress: string }> = ({ walletAddr
         const preparedJoinTx = await server.prepareTransaction(joinTx);
         await submitTransaction(preparedJoinTx, walletAddress);
         
+        onTransactionComplete?.(); // Refresh wallet balance after deploy
         alert(`Circle deployed successfully and you were auto-joined!\nInvite Code: ${inviteCode}\nTx Hash: ${txHash}`);
       } catch (joinErr: any) {
         captureError(joinErr, { context: 'Auto Join Circle' });

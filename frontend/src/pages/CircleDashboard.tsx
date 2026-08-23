@@ -4,7 +4,7 @@ import { trackEvent, captureError } from '../services/analytics';
 import { db, type CircleMetadata } from '../services/db';
 import '../styles/index.css';
 
-export const CircleDashboard: React.FC<{ walletAddress: string }> = ({ walletAddress }) => {
+export const CircleDashboard: React.FC<{ walletAddress: string; onTransactionComplete?: () => void }> = ({ walletAddress, onTransactionComplete }) => {
   const navigate = useNavigate();
   const [circles, setCircles] = useState<CircleMetadata[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -71,6 +71,7 @@ export const CircleDashboard: React.FC<{ walletAddress: string }> = ({ walletAdd
 
       const preparedTx = await server.prepareTransaction(tx);
       const { txHash: submittedHash } = await submitTransaction(preparedTx, walletAddress);
+      onTransactionComplete?.(); // Refresh wallet balance immediately after tx
 
       // --- Update Firebase contributions ---
       const currentCycle = activeCircle.currentCycle || 1;
@@ -114,6 +115,7 @@ export const CircleDashboard: React.FC<{ walletAddress: string }> = ({ walletAdd
 
           const preparedPayoutTx = await server.prepareTransaction(payoutTx);
           const { txHash: payoutHash } = await submitTransaction(preparedPayoutTx, walletAddress);
+          onTransactionComplete?.(); // Refresh wallet balance after payout received
           trackEvent('Payout Auto-Triggered', { circleId: activeCircle.id, cycle: currentCycle, txHash: payoutHash });
 
           // Advance cycle in Firebase
@@ -189,6 +191,7 @@ export const CircleDashboard: React.FC<{ walletAddress: string }> = ({ walletAdd
 
       const preparedTx = await server.prepareTransaction(tx);
       await submitTransaction(preparedTx, walletAddress);
+      onTransactionComplete?.(); // Refresh wallet balance after refund on leave
 
       // ── Off-chain: update Firebase ──
       if (isLastMember) {

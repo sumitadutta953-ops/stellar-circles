@@ -4,7 +4,7 @@ import { trackEvent, captureError } from '../services/analytics';
 import { db } from '../services/db';
 import '../styles/index.css';
 
-export const JoinCircle: React.FC<{ walletAddress: string }> = ({ walletAddress }) => {
+export const JoinCircle: React.FC<{ walletAddress: string; onTransactionComplete?: () => void }> = ({ walletAddress, onTransactionComplete }) => {
   const navigate = useNavigate();
   const [inviteCode, setInviteCode] = useState('');
   const [yourName, setYourName] = useState('');
@@ -73,9 +73,11 @@ export const JoinCircle: React.FC<{ walletAddress: string }> = ({ walletAddress 
       });
 
       trackEvent('Circle Joined', { circleId: circleToJoin.id, txHash });
+      onTransactionComplete?.(); // Refresh wallet balance
       alert(`Successfully joined ${circleToJoin.name}!\nTx Hash: ${txHash}`);
       navigate('/');
     } catch (error: any) {
+
       captureError(error, { context: 'Join Circle' });
       alert('Failed to join circle: ' + (error.message || error));
     } finally {

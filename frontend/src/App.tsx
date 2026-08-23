@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { WalletConnect } from './components/WalletConnect';
 import { initAnalytics } from './services/analytics';
@@ -8,13 +8,28 @@ import { JoinCircle } from './pages/JoinCircle';
 import './styles/index.css';
 
 function App() {
-    const [wallet, setWallet] = useState<{ address: string; method: string; balance: string } | null>(null);
+  const [wallet, setWallet] = useState<{ address: string; method: string; balance: string } | null>(null);
+
+  const refreshBalance = useCallback(async (address: string) => {
+    const { getNativeBalance } = await import('./services/stellar');
+    const balance = await getNativeBalance(address);
+    setWallet(prev => prev ? { ...prev, balance } : prev);
+  }, []);
 
   const handleConnect = async (address: string, method: string) => {
     const { getNativeBalance } = await import('./services/stellar');
     const balance = await getNativeBalance(address);
     setWallet({ address, method, balance });
   };
+
+  // Auto-refresh balance every 15 seconds when wallet is connected
+  useEffect(() => {
+    if (!wallet?.address) return;
+    const interval = setInterval(() => {
+      refreshBalance(wallet.address);
+    }, 15000);
+    return () => clearInterval(interval);
+  }, [wallet?.address, refreshBalance]);
 
   useEffect(() => {
     initAnalytics();
@@ -37,8 +52,16 @@ function App() {
                 <span style={{ opacity: 0.5, margin: '0 var(--space-2)' }}>|</span>
                 {wallet.method === 'passkey' ? 'Passkey' : 'Freighter'}: {wallet.address}
               </span>
-              <button 
-                className="btn btn-secondary" 
+              <button
+                className="btn btn-secondary"
+                style={{ padding: 'var(--space-1) var(--space-3)', fontSize: 'var(--text-xs)' }}
+                onClick={() => refreshBalance(wallet.address)}
+                title="Refresh balance"
+              >
+                🔄
+              </button>
+              <button
+                className="btn btn-secondary"
                 style={{ padding: 'var(--space-1) var(--space-3)', fontSize: 'var(--text-xs)' }}
                 onClick={() => setWallet(null)}
               >
@@ -55,9 +78,9 @@ function App() {
             </div>
           ) : (
             <Routes>
-              <Route path="/" element={<CircleDashboard walletAddress={wallet.address} />} />
-              <Route path="/create" element={<CircleCreation walletAddress={wallet.address} />} />
-              <Route path="/join" element={<JoinCircle walletAddress={wallet.address} />} />
+              <Route path="/" element={<CircleDashboard walletAddress={wallet.address} onTransactionComplete={() => refreshBalance(wallet.address)} />} />
+              <Route path="/create" element={<CircleCreation walletAddress={wallet.address} onTransactionComplete={() => refreshBalance(wallet.address)} />} />
+              <Route path="/join" element={<JoinCircle walletAddress={wallet.address} onTransactionComplete={() => refreshBalance(wallet.address)} />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           )}

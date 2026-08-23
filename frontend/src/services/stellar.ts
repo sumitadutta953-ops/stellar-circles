@@ -25,43 +25,42 @@ export async function submitTransaction(
     // If authentication succeeds, sign the transaction using the stored Keypair
     const keypair = StellarSdk.Keypair.fromSecret(localSecret);
     
-    try {
-      const { sequence } = await server.getLatestLedger();
-      const validUntil = sequence + 500; // valid for 500 ledgers (~40 minutes)
-      
-      const innerTx = tx.tx; // xdr.Transaction
-      const operations = innerTx.operations();
-      let authModified = false;
-      
-      for (let i = 0; i < operations.length; i++) {
-         const body = operations[i].body();
-         if (body.switch().name === 'invokeHostFunction') {
-             const op = body.invokeHostFunctionOp();
-             const auth = op.auth();
-             if (auth && auth.length > 0) {
-                 const newAuth = [];
-                 for (let j = 0; j < auth.length; j++) {
-                    const signedEntry = await StellarSdk.authorizeEntry(auth[j], keypair, validUntil, networkPassphrase);
-                    newAuth.push(signedEntry);
-                 }
-                 op.auth(newAuth);
-                 authModified = true;
-             }
-         }
-      }
-      
-      if (authModified) {
-         // Reconstruct the transaction if auth entries were mutated
-         const env = StellarSdk.xdr.TransactionEnvelope.envelopeTypeTx(
-           new StellarSdk.xdr.TransactionV1Envelope({
-             tx: innerTx as any,
-             signatures: []
-           })
-         );
-         tx = new StellarSdk.Transaction(env.toXDR('base64'), networkPassphrase);
-      }
-    } catch (authErr) {
-      console.warn("Failed to sign inner auth entries:", authErr);
+    // Sign all Soroban auth entries (including token.transfer auth) BEFORE signing envelope
+    // If this fails, we must abort — not silently submit an unauthorized transaction
+    const { sequence } = await server.getLatestLedger();
+    const validUntil = sequence + 500; // valid for 500 ledgers (~40 minutes)
+    
+    const innerTx = tx.tx; // xdr.Transaction
+    const operations = innerTx.operations();
+    let authModified = false;
+    
+    for (let i = 0; i < operations.length; i++) {
+       const body = operations[i].body();
+       if (body.switch().name === 'invokeHostFunction') {
+           const op = body.invokeHostFunctionOp();
+           const auth = op.auth();
+           if (auth && auth.length > 0) {
+               const newAuth = [];
+               for (let j = 0; j < auth.length; j++) {
+                  // This signs BOTH the contract-call auth AND the inner token.transfer auth
+                  const signedEntry = await StellarSdk.authorizeEntry(auth[j], keypair, validUntil, networkPassphrase);
+                  newAuth.push(signedEntry);
+               }
+               op.auth(newAuth);
+               authModified = true;
+           }
+       }
+    }
+    
+    if (authModified) {
+       // Reconstruct the transaction envelope after mutating auth entries
+       const env = StellarSdk.xdr.TransactionEnvelope.envelopeTypeTx(
+         new StellarSdk.xdr.TransactionV1Envelope({
+           tx: innerTx as any,
+           signatures: []
+         })
+       );
+       tx = new StellarSdk.Transaction(env.toXDR('base64'), networkPassphrase);
     }
 
     tx.sign(keypair);
@@ -117,6 +116,7 @@ export async function getAccount(publicKey: string): Promise<StellarSdk.Account>
   const accountInfo = await server.getAccount(publicKey);
   return new StellarSdk.Account(publicKey, accountInfo.sequenceNumber());
 }
+
 export async function getNativeBalance(publicKey: string): Promise<string> {
   try {
     const horizon = new StellarSdk.Horizon.Server('https://horizon-testnet.stellar.org');
