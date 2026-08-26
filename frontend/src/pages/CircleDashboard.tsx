@@ -235,7 +235,7 @@ export const CircleDashboard: React.FC<{ walletAddress: string; onTransactionCom
   }
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 2.5fr', gap: 'var(--space-8)' }}>
+    <div className="dashboard-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 2.5fr', gap: 'var(--space-6)' }}>
       {/* Sidebar: Circle List */}
       <div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)' }}>
@@ -352,7 +352,7 @@ export const CircleDashboard: React.FC<{ walletAddress: string; onTransactionCom
               )}
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
+            <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
               <div className="glass-card" style={{ background: 'rgba(255,255,255,0.02)' }}>
                 <h4 className="text-muted" style={{ marginBottom: 'var(--space-2)' }}>Current Cycle</h4>
                 <div style={{ fontSize: 'var(--text-3xl)', fontWeight: 700, color: 'var(--color-accent)' }}>
@@ -377,7 +377,7 @@ export const CircleDashboard: React.FC<{ walletAddress: string; onTransactionCom
                 <p className="text-muted" style={{ margin: 0 }}>All members have received their payouts. No further contributions are needed.</p>
               </div>
             ) : (
-              <div style={{ display: 'flex', gap: 'var(--space-4)', marginTop: 'var(--space-4)' }}>
+              <div className="action-row" style={{ display: 'flex', gap: 'var(--space-4)', marginTop: 'var(--space-4)' }}>
                 {(() => {
                   const currentCycle = activeCircle.currentCycle || 1;
                   const alreadyPaid = activeCircle.contributions?.[currentCycle]?.includes(walletAddress) ?? false;

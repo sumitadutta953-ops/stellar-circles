@@ -125,7 +125,7 @@ export const CircleCreation: React.FC<{ walletAddress: string; onTransactionComp
   };
 
   return (
-    <div className="glass-card animate-fade-in" style={{ maxWidth: '600px', margin: '0 auto' }}>
+    <div className="glass-card animate-fade-in" style={{ maxWidth: '600px', margin: '0 auto', width: '100%' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-6)' }}>
         <h2 className="heading-2 text-gradient">Create a Circle</h2>
         <button className="btn btn-secondary" onClick={() => navigate('/')}>Back</button>
@@ -172,7 +172,7 @@ export const CircleCreation: React.FC<{ walletAddress: string; onTransactionComp
           />
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
+        <div className="form-grid-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
           <div>
             <label style={{ display: 'block', marginBottom: 'var(--space-1)', color: 'var(--color-text-muted)' }}>Contribution per Cycle (XLM)</label>
             <input 

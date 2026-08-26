@@ -224,3 +224,85 @@ a:hover {
 .animate-pulse {
   animation: pulse 2s infinite;
 }
+
+/* ============================================
+   MOBILE-FIRST RESPONSIVE OVERRIDES
+   ============================================ */
+
+/* Tighter glass-card padding on small screens */
+@media (max-width: 640px) {
+  .glass-card {
+    padding: var(--space-4);
+  }
+
+  /* Headings scale down */
+  .heading-1 { font-size: var(--text-2xl); }
+  .heading-2 { font-size: var(--text-xl); }
+  .heading-3 { font-size: var(--text-lg); }
+
+  /* Buttons should be full-width and easier to tap */
+  .btn {
+    min-height: 44px;
+    font-size: var(--text-sm);
+  }
+
+  /* Inputs easier to tap */
+  .input-field {
+    font-size: 16px; /* Prevents iOS zoom on focus */
+    min-height: 44px;
+  }
+
+  /* ---- App Header ---- */
+  .app-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: var(--space-3) !important;
+  }
+
+  .app-header-wallet {
+    width: 100%;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: var(--space-2) !important;
+  }
+
+  .app-header-wallet-address {
+    font-size: var(--text-xs) !important;
+    word-break: break-all;
+  }
+
+  .app-header-actions {
+    display: flex;
+    gap: var(--space-2);
+    width: 100%;
+  }
+
+  .app-header-actions .btn {
+    flex: 1;
+  }
+
+  /* ---- Dashboard: stack sidebar above main ---- */
+  .dashboard-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* ---- Stat cards: single column ---- */
+  .stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* ---- Creation form: single column ---- */
+  .form-grid-2col {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* ---- JoinCircle: reduce top margin ---- */
+  .join-card {
+    margin-top: var(--space-6) !important;
+  }
+
+  /* Contribute action row: stack buttons */
+  .action-row {
+    flex-direction: column !important;
+  }
+}

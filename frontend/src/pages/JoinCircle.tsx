@@ -86,7 +86,7 @@ export const JoinCircle: React.FC<{ walletAddress: string; onTransactionComplete
   };
 
   return (
-    <div className="glass-card animate-fade-in" style={{ maxWidth: '400px', margin: '4rem auto' }}>
+    <div className="glass-card join-card animate-fade-in" style={{ maxWidth: '400px', margin: '4rem auto', width: '100%' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-6)' }}>
         <h2 className="heading-2">Join Circle</h2>
         <button className="btn btn-secondary" onClick={() => navigate('/')}>Back</button>
