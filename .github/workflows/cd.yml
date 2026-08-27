@@ -11,7 +11,6 @@ on:
         default: 'false'
         type: boolean
 
-# Ensure only one CD run at a time to avoid sequence conflicts
 concurrency:
   group: cd-${{ github.ref }}
   cancel-in-progress: false
@@ -19,8 +18,6 @@ concurrency:
 jobs:
   # ---------------------------------------------------------
   # JOB 1: Build & Upload Soroban WASM Artifacts
-  # Always runs on push to main. Produces compiled .wasm files
-  # as GitHub build artifacts for traceability.
   # ---------------------------------------------------------
   build-contracts:
     name: Build Soroban WASM Artifacts
@@ -45,7 +42,13 @@ jobs:
           workspaces: ./contracts -> target
 
       - name: Install system dependencies for Stellar CLI
-        run: sudo apt-get update -y && sudo apt-get install -y libdbus-1-dev pkg-config
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y \
+            libdbus-1-dev \
+            libudev-dev \
+            libusb-1.0-0-dev \
+            pkg-config
 
       - name: Install Stellar CLI
         run: cargo install stellar-cli --locked
@@ -71,9 +74,7 @@ jobs:
 
   # ---------------------------------------------------------
   # JOB 2: Deploy Soroban Contracts to Testnet
-  # Only runs when manually triggered with deploy_contracts=true
-  # OR when a [deploy-contracts] tag appears in the commit message.
-  # This prevents creating new contract IDs on every push.
+  # Triggered manually or via [deploy-contracts] commit message
   # ---------------------------------------------------------
   deploy-contracts:
     name: Deploy Soroban Contracts to Testnet
@@ -93,7 +94,13 @@ jobs:
           targets: wasm32v1-none
 
       - name: Install system dependencies for Stellar CLI
-        run: sudo apt-get update -y && sudo apt-get install -y libdbus-1-dev pkg-config
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y \
+            libdbus-1-dev \
+            libudev-dev \
+            libusb-1.0-0-dev \
+            pkg-config
 
       - name: Install Stellar CLI
         run: cargo install stellar-cli --locked
@@ -232,8 +239,6 @@ jobs:
 
   # ---------------------------------------------------------
   # JOB 3: Deploy Frontend to Vercel
-  # Runs on every push to main after CI passes.
-  # Uses Vercel CLI for explicit, auditable deployments.
   # ---------------------------------------------------------
   deploy-frontend:
     name: Deploy Frontend to Vercel
