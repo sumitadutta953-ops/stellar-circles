@@ -1,4 +1,4 @@
-name: CI Pipeline (Level 4 Rigor)
+name: CI Pipeline — Smart Contracts & Frontend
 
 on:
   push:
@@ -67,10 +67,18 @@ jobs:
         with:
           workspaces: ./contracts -> target
 
-      - name: Build WASM
-        run: cargo build --target wasm32v1-none --release
+      - name: Install Stellar CLI
+        run: cargo install stellar-cli --features opt --locked
 
-      - name: Run Tests
+      - name: Build Soroban Contracts (stellar contract build)
+        run: stellar contract build
+
+      - name: Verify WASM output
+        run: |
+          echo "Compiled WASM files:"
+          find target/wasm32v1-none/release -name "*.wasm" | sort
+
+      - name: Run Contract Tests
         run: cargo test --workspace
 
   # ---------------------------------------------------------
