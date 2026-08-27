@@ -68,7 +68,7 @@ jobs:
           workspaces: ./contracts -> target
 
       - name: Install Stellar CLI
-        run: cargo install stellar-cli --features opt --locked
+        run: cargo install stellar-cli --locked
 
       - name: Build Soroban Contracts (stellar contract build)
         run: stellar contract build

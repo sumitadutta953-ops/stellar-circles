@@ -45,7 +45,7 @@ jobs:
           workspaces: ./contracts -> target
 
       - name: Install Stellar CLI
-        run: cargo install stellar-cli --features opt --locked
+        run: cargo install stellar-cli --locked
 
       - name: Build all Soroban contracts (stellar contract build)
         run: stellar contract build
@@ -90,7 +90,7 @@ jobs:
           targets: wasm32v1-none
 
       - name: Install Stellar CLI
-        run: cargo install stellar-cli --features opt --locked
+        run: cargo install stellar-cli --locked
 
       - name: Download WASM artifacts
         uses: actions/download-artifact@v4
@@ -275,3 +275,4 @@ jobs:
           working-directory: ./frontend
           vercel-args: '--prod'
         continue-on-error: true
+

@@ -6,7 +6,7 @@ Thank you for your interest in contributing! This project is built on Stellar So
 
 ### Prerequisites
 - Rust stable + `wasm32v1-none` target (`rustup target add wasm32v1-none`)
-- [Stellar CLI](https://developers.stellar.org/docs/tools/developer-tools/cli/install-cli)
+- [Stellar CLI](https://developers.stellar.org/docs/tools/developer-tools/cli/install-cli) (`cargo install stellar-cli`)
 - Node.js v20+
 - [Freighter](https://freighter.app) wallet extension
 
