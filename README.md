@@ -324,7 +324,7 @@ The following on-chain wallet interactions were recorded on Stellar Testnet, pro
 
 ## 💬 User Feedback Summary
 
-Collected from 5 beta testers during Testnet demo sessions. Feedback focused primarily on UI and UX improvements:
+Feedback collected from 10+ users during the testing phase. The following are the main points focusing primarily on UI and UX improvements:
 
 | Tester | Feedback Summary |
 |---|---|
