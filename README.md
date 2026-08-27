@@ -288,17 +288,22 @@ Runs on every push to `main`:
 
 ## 📱 Screenshots
 
+> Add your screenshots to `frontend/public/` and update the paths below.
+
 ### Desktop — Wallet Connect
-> Passkey (WebAuthn) and Freighter wallet options with auto-funding via Friendbot
+![Wallet Connect](./frontend/public/screenshot-wallet.png)
 
 ### Desktop — Circle Dashboard
-> Real-time contribution ledger showing paid/pending status per member per cycle
+![Circle Dashboard](./frontend/public/screenshot-dashboard.png)
 
 ### Desktop — Create Circle
-> Form to deploy a new `CircleFactory.create_circle` on-chain transaction
+![Create Circle](./frontend/public/screenshot-create.png)
 
 ### Mobile Responsive
-> Full responsive layout tested on 375px, 768px, and 1440px viewports
+![Mobile View](./frontend/public/screenshot-mobile.png)
+
+### Analytics / Monitoring
+![PostHog Analytics](./frontend/public/screenshot-analytics.png)
 
 ---
 
