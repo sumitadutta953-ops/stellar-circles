@@ -44,6 +44,9 @@ jobs:
         with:
           workspaces: ./contracts -> target
 
+      - name: Install system dependencies for Stellar CLI
+        run: sudo apt-get update -y && sudo apt-get install -y libdbus-1-dev pkg-config
+
       - name: Install Stellar CLI
         run: cargo install stellar-cli --locked
 
@@ -69,7 +72,7 @@ jobs:
   # ---------------------------------------------------------
   # JOB 2: Deploy Soroban Contracts to Testnet
   # Only runs when manually triggered with deploy_contracts=true
-  # OR when a [deploy] tag appears in the commit message.
+  # OR when a [deploy-contracts] tag appears in the commit message.
   # This prevents creating new contract IDs on every push.
   # ---------------------------------------------------------
   deploy-contracts:
@@ -88,6 +91,9 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: wasm32v1-none
+
+      - name: Install system dependencies for Stellar CLI
+        run: sudo apt-get update -y && sudo apt-get install -y libdbus-1-dev pkg-config
 
       - name: Install Stellar CLI
         run: cargo install stellar-cli --locked
@@ -275,4 +281,3 @@ jobs:
           working-directory: ./frontend
           vercel-args: '--prod'
         continue-on-error: true
-
