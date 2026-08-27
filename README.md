@@ -288,17 +288,6 @@ Runs on every push to `main`:
 
 ## 📱 Screenshots
 
-> Add your screenshots to `frontend/public/` and update the paths below.
-
-### Desktop — Wallet Connect
-![Wallet Connect](./frontend/public/screenshot-wallet.png)
-
-### Desktop — Circle Dashboard
-![Circle Dashboard](./frontend/public/screenshot-dashboard.png)
-
-### Desktop — Create Circle
-![Create Circle](./frontend/public/screenshot-create.png)
-
 ### Mobile Responsive UI
 ![Mobile View 1](./frontend/src/ss/mp1.png)
 ![Mobile View 2](./frontend/src/ss/mp2.png)
