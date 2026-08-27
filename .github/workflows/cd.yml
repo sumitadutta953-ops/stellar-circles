@@ -1,0 +1,277 @@
+name: CD Pipeline — Deploy Contracts & Frontend
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+    inputs:
+      deploy_contracts:
+        description: 'Deploy Soroban contracts to Testnet'
+        required: false
+        default: 'false'
+        type: boolean
+
+# Ensure only one CD run at a time to avoid sequence conflicts
+concurrency:
+  group: cd-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  # ---------------------------------------------------------
+  # JOB 1: Build & Upload Soroban WASM Artifacts
+  # Always runs on push to main. Produces compiled .wasm files
+  # as GitHub build artifacts for traceability.
+  # ---------------------------------------------------------
+  build-contracts:
+    name: Build Soroban WASM Artifacts
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./contracts
+    outputs:
+      wasm-artifact-name: ${{ steps.set-artifact-name.outputs.name }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Rust Toolchain (stable + wasm32v1-none)
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32v1-none
+
+      - name: Cache Rust Dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ./contracts -> target
+
+      - name: Install Stellar CLI
+        run: cargo install stellar-cli --features opt --locked
+
+      - name: Build all Soroban contracts (stellar contract build)
+        run: stellar contract build
+
+      - name: List compiled WASM files
+        run: |
+          echo "Compiled WASM artifacts:"
+          find target/wasm32v1-none/release -name "*.wasm" | sort
+
+      - name: Set artifact name
+        id: set-artifact-name
+        run: echo "name=soroban-wasm-${{ github.sha }}" >> $GITHUB_OUTPUT
+
+      - name: Upload WASM artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.set-artifact-name.outputs.name }}
+          path: contracts/target/wasm32v1-none/release/*.wasm
+          retention-days: 30
+
+  # ---------------------------------------------------------
+  # JOB 2: Deploy Soroban Contracts to Testnet
+  # Only runs when manually triggered with deploy_contracts=true
+  # OR when a [deploy] tag appears in the commit message.
+  # This prevents creating new contract IDs on every push.
+  # ---------------------------------------------------------
+  deploy-contracts:
+    name: Deploy Soroban Contracts to Testnet
+    runs-on: ubuntu-latest
+    needs: build-contracts
+    if: >
+      github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_contracts == 'true'
+      || contains(github.event.head_commit.message, '[deploy-contracts]')
+    environment: testnet
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Rust Toolchain (stable + wasm32v1-none)
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32v1-none
+
+      - name: Install Stellar CLI
+        run: cargo install stellar-cli --features opt --locked
+
+      - name: Download WASM artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.build-contracts.outputs.wasm-artifact-name }}
+          path: contracts/target/wasm32v1-none/release/
+
+      - name: Configure Stellar identity from secret
+        env:
+          STELLAR_SECRET_KEY: ${{ secrets.STELLAR_SECRET_KEY }}
+        run: |
+          stellar keys add deployer --secret-key "$STELLAR_SECRET_KEY"
+          echo "Deployer address: $(stellar keys address deployer)"
+
+      - name: Deploy circle-factory contract
+        id: deploy_circle_factory
+        run: |
+          CIRCLE_FACTORY_ID=$(stellar contract deploy \
+            --wasm contracts/target/wasm32v1-none/release/circle_factory.wasm \
+            --source deployer \
+            --network testnet)
+          echo "circle_factory_id=$CIRCLE_FACTORY_ID" >> $GITHUB_OUTPUT
+          echo "circle-factory ID: $CIRCLE_FACTORY_ID"
+
+      - name: Initialize circle-factory
+        run: |
+          ADMIN_ADDR=$(stellar keys address deployer)
+          stellar contract invoke \
+            --id ${{ steps.deploy_circle_factory.outputs.circle_factory_id }} \
+            --source deployer \
+            --network testnet \
+            -- init --admin "$ADMIN_ADDR"
+
+      - name: Deploy contribution contract
+        id: deploy_contribution
+        run: |
+          CONTRIBUTION_ID=$(stellar contract deploy \
+            --wasm contracts/target/wasm32v1-none/release/contribution.wasm \
+            --source deployer \
+            --network testnet)
+          echo "contribution_id=$CONTRIBUTION_ID" >> $GITHUB_OUTPUT
+          echo "contribution ID: $CONTRIBUTION_ID"
+
+      - name: Initialize contribution contract
+        run: |
+          stellar contract invoke \
+            --id ${{ steps.deploy_contribution.outputs.contribution_id }} \
+            --source deployer \
+            --network testnet \
+            -- init --factory ${{ steps.deploy_circle_factory.outputs.circle_factory_id }}
+
+      - name: Deploy payout contract
+        id: deploy_payout
+        run: |
+          PAYOUT_ID=$(stellar contract deploy \
+            --wasm contracts/target/wasm32v1-none/release/payout.wasm \
+            --source deployer \
+            --network testnet)
+          echo "payout_id=$PAYOUT_ID" >> $GITHUB_OUTPUT
+          echo "payout ID: $PAYOUT_ID"
+
+      - name: Initialize payout contract
+        run: |
+          stellar contract invoke \
+            --id ${{ steps.deploy_payout.outputs.payout_id }} \
+            --source deployer \
+            --network testnet \
+            -- init \
+              --factory ${{ steps.deploy_circle_factory.outputs.circle_factory_id }} \
+              --contribution_contract ${{ steps.deploy_contribution.outputs.contribution_id }}
+
+      - name: Deploy passkey-factory contract
+        id: deploy_passkey_factory
+        run: |
+          PASSKEY_FACTORY_ID=$(stellar contract deploy \
+            --wasm contracts/target/wasm32v1-none/release/passkey_factory.wasm \
+            --source deployer \
+            --network testnet)
+          echo "passkey_factory_id=$PASSKEY_FACTORY_ID" >> $GITHUB_OUTPUT
+          echo "passkey-factory ID: $PASSKEY_FACTORY_ID"
+
+      - name: Install passkey-wallet WASM hash
+        id: install_passkey_wasm
+        run: |
+          WASM_HASH=$(stellar contract install \
+            --wasm contracts/target/wasm32v1-none/release/passkey_wallet.wasm \
+            --source deployer \
+            --network testnet)
+          echo "wasm_hash=$WASM_HASH" >> $GITHUB_OUTPUT
+          echo "passkey-wallet WASM hash: $WASM_HASH"
+
+      - name: Initialize passkey-factory
+        run: |
+          stellar contract invoke \
+            --id ${{ steps.deploy_passkey_factory.outputs.passkey_factory_id }} \
+            --source deployer \
+            --network testnet \
+            -- init \
+              --wallet_wasm_hash ${{ steps.install_passkey_wasm.outputs.wasm_hash }}
+
+      - name: Deploy reputation contract
+        id: deploy_reputation
+        run: |
+          REPUTATION_ID=$(stellar contract deploy \
+            --wasm contracts/target/wasm32v1-none/release/reputation.wasm \
+            --source deployer \
+            --network testnet)
+          echo "reputation_id=$REPUTATION_ID" >> $GITHUB_OUTPUT
+          echo "reputation ID: $REPUTATION_ID"
+
+      - name: Deploy default-handler contract
+        id: deploy_default_handler
+        run: |
+          DEFAULT_HANDLER_ID=$(stellar contract deploy \
+            --wasm contracts/target/wasm32v1-none/release/default_handler.wasm \
+            --source deployer \
+            --network testnet)
+          echo "default_handler_id=$DEFAULT_HANDLER_ID" >> $GITHUB_OUTPUT
+          echo "default-handler ID: $DEFAULT_HANDLER_ID"
+
+      - name: Print all deployed contract IDs
+        run: |
+          echo "========================================"
+          echo "DEPLOYED SOROBAN CONTRACT ADDRESSES"
+          echo "========================================"
+          echo "VITE_CIRCLE_FACTORY_ID=${{ steps.deploy_circle_factory.outputs.circle_factory_id }}"
+          echo "VITE_CONTRIBUTION_ID=${{ steps.deploy_contribution.outputs.contribution_id }}"
+          echo "VITE_PAYOUT_ID=${{ steps.deploy_payout.outputs.payout_id }}"
+          echo "VITE_PASSKEY_FACTORY_ID=${{ steps.deploy_passkey_factory.outputs.passkey_factory_id }}"
+          echo "VITE_REPUTATION_ID=${{ steps.deploy_reputation.outputs.reputation_id }}"
+          echo "VITE_DEFAULT_HANDLER_ID=${{ steps.deploy_default_handler.outputs.default_handler_id }}"
+          echo "========================================"
+
+  # ---------------------------------------------------------
+  # JOB 3: Deploy Frontend to Vercel
+  # Runs on every push to main after CI passes.
+  # Uses Vercel CLI for explicit, auditable deployments.
+  # ---------------------------------------------------------
+  deploy-frontend:
+    name: Deploy Frontend to Vercel
+    runs-on: ubuntu-latest
+    needs: build-contracts
+    defaults:
+      run:
+        working-directory: ./frontend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: './frontend/package-lock.json'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Production Build
+        run: npm run build
+        env:
+          VITE_CIRCLE_FACTORY_ID: ${{ secrets.VITE_CIRCLE_FACTORY_ID }}
+          VITE_CONTRIBUTION_ID: ${{ secrets.VITE_CONTRIBUTION_ID }}
+          VITE_PAYOUT_ID: ${{ secrets.VITE_PAYOUT_ID }}
+          VITE_PASSKEY_FACTORY_ID: ${{ secrets.VITE_PASSKEY_FACTORY_ID }}
+          VITE_REPUTATION_ID: ${{ secrets.VITE_REPUTATION_ID }}
+          VITE_DEFAULT_HANDLER_ID: ${{ secrets.VITE_DEFAULT_HANDLER_ID }}
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
+
+      - name: Deploy to Vercel (Production)
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          working-directory: ./frontend
+          vercel-args: '--prod'
+        continue-on-error: true
