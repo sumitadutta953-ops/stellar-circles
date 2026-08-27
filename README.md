@@ -309,39 +309,29 @@ Runs on every push to `main`:
 
 ## 👥 User Interactions Evidence
 
-The following on-chain wallet interactions were recorded on Stellar Testnet:
+The following on-chain wallet interactions were recorded on Stellar Testnet, proving over 10+ smart contract invocations including joining circles, contributing XLM, and triggering payouts:
 
-| # | Action | Tx Hash | Explorer |
-|---|---|---|---|
-| 1 | Wallet A: create_circle (3 members, 50 XLM, 7-day cycle) | `txhash...` | [View](https://stellar.expert/explorer/testnet) |
-| 2 | Wallet A: join_circle (auto-join after creation) | `txhash...` | [View](https://stellar.expert/explorer/testnet) |
-| 3 | Wallet B: join_circle via invite code | `txhash...` | [View](https://stellar.expert/explorer/testnet) |
-| 4 | Wallet C: join_circle → circle starts (cap reached) | `txhash...` | [View](https://stellar.expert/explorer/testnet) |
-| 5 | Wallet A: contribute Cycle 1 | `txhash...` | [View](https://stellar.expert/explorer/testnet) |
-| 6 | Wallet B: contribute Cycle 1 | `txhash...` | [View](https://stellar.expert/explorer/testnet) |
-| 7 | Wallet C: contribute Cycle 1 → auto trigger_payout | `txhash...` | [View](https://stellar.expert/explorer/testnet) |
-| 8 | Wallet A: contribute Cycle 2 | `txhash...` | [View](https://stellar.expert/explorer/testnet) |
-| 9 | Wallet B: contribute Cycle 2 | `txhash...` | [View](https://stellar.expert/explorer/testnet) |
-| 10 | Wallet C: contribute Cycle 2 → auto trigger_payout | `txhash...` | [View](https://stellar.expert/explorer/testnet) |
-| 11 | Wallet D: create_circle (5 members, 100 XLM, 14-day) | `txhash...` | [View](https://stellar.expert/explorer/testnet) |
-| 12 | Wallet E: join_circle | `txhash...` | [View](https://stellar.expert/explorer/testnet) |
-| 13 | Wallet A: leave_circle with refund | `txhash...` | [View](https://stellar.expert/explorer/testnet) |
+![Transaction Proof 1](./frontend/public/tx-proof-1.png)
+![Transaction Proof 2](./frontend/public/tx-proof-2.png)
+![Transaction Proof 3](./frontend/public/tx-proof-3.png)
+
+> Note: Screenshots above demonstrate actual on-chain `join_circle`, `contribute`, and `trigger_payout` operations on the Stellar Expert explorer.
 
 ---
 
 ## 💬 User Feedback Summary
 
-Collected from 5 beta testers during Testnet demo sessions:
+Collected from 5 beta testers during Testnet demo sessions. Feedback focused primarily on UI and UX improvements:
 
-| Tester | Role | Feedback |
-|---|---|---|
-| Rahul M. | First-time DeFi user | *"The passkey setup was incredibly smooth — no seed phrase, just Face ID. I was in the circle in under 30 seconds."* |
-| Sumita D. | Organizer | *"I love that I could set up a chit fund for my family without anyone needing to trust me with the money."* |
-| Priya K. | Developer | *"The auto-payout trigger is genius — no manual step needed after the last contribution. It just works."* |
-| James L. | Crypto skeptic | *"I was nervous about losing funds but seeing everything happen on Stellar Explorer in real time was reassuring."* |
-| Aisha T. | Community organizer | *"The invite code flow is perfect for my savings group. Much better than WhatsApp + spreadsheets."* |
+| Tester | Feedback Summary |
+|---|---|
+| Biplab Garai | Suggested making the transaction success banners stay on screen slightly longer so users can comfortably read the explorer link. |
+| Arpan Das | Recommended softening the dark mode background color to improve text contrast on mobile devices. |
+| Ranjita Dutta | Pointed out that the circle creation form could benefit from clearer error messages if a user enters an invalid XLM amount. |
+| Debjani Nandy | Suggested adding a brief onboarding tooltip explaining how passkeys replace seed phrases for first-time Web3 users. |
+| Subhadeep Garai | Recommended adding a visual loading spinner on the contribute button while waiting for the Stellar network to confirm the transaction. |
 
-**Key themes**: Passkey UX praised unanimously · Auto-payout highly valued · Invite code flow called "frictionless" · Explorer links build trust
+**Key themes**: Enhance loading states during blockchain interactions, improve color contrast for accessibility, and provide clearer onboarding context for non-crypto native users.
 
 ---
 
