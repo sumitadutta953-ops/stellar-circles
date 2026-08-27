@@ -38,7 +38,7 @@ Stellar Circles replaces the human organizer with **Soroban smart contracts**. E
 | Resource | Link |
 |---|---|
 | **Live App** | [https://stellar-circles.vercel.app](https://stellar-circles.vercel.app) |
-| **Demo Video** | [Watch on YouTube](https://youtu.be/demo-stellar-circles) |
+| **Demo Video** | [Watch on Google Drive](https://drive.google.com/file/d/1xphp1EkNypL4W5do3OBhRWi5JBjoeMR-/view?usp=sharing) |
 | **Stellar Expert** | [View Contracts on Testnet Explorer](https://stellar.expert/explorer/testnet) |
 
 ---
@@ -299,8 +299,11 @@ Runs on every push to `main`:
 ### Desktop — Create Circle
 ![Create Circle](./frontend/public/screenshot-create.png)
 
-### Mobile Responsive
-![Mobile View](./frontend/public/screenshot-mobile.png)
+### Mobile Responsive UI
+![Mobile View 1](./frontend/src/ss/mp1.png)
+![Mobile View 2](./frontend/src/ss/mp2.png)
+![Mobile View 3](./frontend/src/ss/mp3.png)
+![Mobile View 4](./frontend/src/ss/mp4.png)
 
 ### Analytics / Monitoring
 ![PostHog Analytics](./frontend/public/screenshot-analytics.png)
@@ -311,9 +314,9 @@ Runs on every push to `main`:
 
 The following on-chain wallet interactions were recorded on Stellar Testnet, proving over 10+ smart contract invocations including joining circles, contributing XLM, and triggering payouts:
 
-![Transaction Proof 1](./frontend/public/tx-proof-1.png)
-![Transaction Proof 2](./frontend/public/tx-proof-2.png)
-![Transaction Proof 3](./frontend/public/tx-proof-3.png)
+![Transaction Proof 1](./frontend/src/ss/ts1.png)
+![Transaction Proof 2](./frontend/src/ss/ts2.png)
+![Transaction Proof 3](./frontend/src/ss/ts3.png)
 
 > Note: Screenshots above demonstrate actual on-chain `join_circle`, `contribute`, and `trigger_payout` operations on the Stellar Expert explorer.
 
