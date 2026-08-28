@@ -7,6 +7,7 @@
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Stellar Testnet](https://img.shields.io/badge/Network-Stellar%20Testnet-7C3AED)](https://stellar.expert/explorer/testnet)
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-stellar--circles.vercel.app-10B981)](https://stellar-circles.vercel.app)
+[![Documentation](https://img.shields.io/badge/Docs-sumitadutta953--ops.github.io-6366f1)](https://sumitadutta953-ops.github.io/stellar-circles/)
 
 ---
 
@@ -38,6 +39,7 @@ Stellar Circles replaces the human organizer with **Soroban smart contracts**. E
 | Resource | Link |
 |---|---|
 | **Live App** | [https://stellar-circles.vercel.app](https://stellar-circles.vercel.app) |
+| **Documentation** | [https://sumitadutta953-ops.github.io/stellar-circles/](https://sumitadutta953-ops.github.io/stellar-circles/) |
 | **Demo Video** | [Watch on Google Drive](https://drive.google.com/file/d/1xphp1EkNypL4W5do3OBhRWi5JBjoeMR-/view?usp=sharing) |
 | **Stellar Expert** | [View Contracts on Testnet Explorer](https://stellar.expert/explorer/testnet) |
 
