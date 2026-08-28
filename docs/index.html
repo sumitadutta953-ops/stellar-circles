@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stellar Circles — Documentation</title>
+  <meta name="description" content="Complete documentation for Stellar Circles — a decentralized rotating savings platform (ROSCA) built on Stellar Soroban smart contracts." />
+  <meta property="og:title" content="Stellar Circles Documentation" />
+  <meta property="og:description" content="Trustless, on-chain rotating savings circles on Stellar Soroban. Read the full technical documentation." />
+  <meta property="og:type" content="website" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-brand">
+      <span class="nav-logo">🌀</span>
+      <span class="nav-title">Stellar Circles</span>
+      <span class="nav-badge">Docs</span>
+    </div>
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="#overview" class="nav-link">Overview</a></li>
+      <li><a href="#how-it-works" class="nav-link">How It Works</a></li>
+      <li><a href="#architecture" class="nav-link">Architecture</a></li>
+      <li><a href="#contracts" class="nav-link">Contracts</a></li>
+      <li><a href="#frontend" class="nav-link">Frontend</a></li>
+      <li><a href="#setup" class="nav-link">Setup</a></li>
+      <li><a href="#testing" class="nav-link">Testing</a></li>
+      <li><a href="#cicd" class="nav-link">CI/CD</a></li>
+      <li><a href="https://stellar-circles.vercel.app" class="nav-cta" target="_blank" rel="noopener">Live App ↗</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <header class="hero" id="overview">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+      <div class="hero-badge">Built on Stellar Soroban</div>
+      <h1 class="hero-title">
+        <span class="gradient-text">Stellar Circles</span>
+      </h1>
+      <p class="hero-subtitle">Decentralized Rotating Savings on Soroban</p>
+      <p class="hero-desc">
+        A trustless, on-chain implementation of a <strong>ROSCA</strong> (Rotating Savings and Credit Association) — 
+        also known as a <em>Tanda</em>, <em>Chit Fund</em>, or <em>Hui</em> — where smart contracts replace 
+        the human organizer entirely.
+      </p>
+      <div class="hero-badges">
+        <a href="https://github.com/sumitadutta953-ops/stellar-circles/actions/workflows/ci.yml" target="_blank" rel="noopener">
+          <img src="https://github.com/sumitadutta953-ops/stellar-circles/actions/workflows/ci.yml/badge.svg" alt="CI Pipeline" />
+        </a>
+        <a href="https://github.com/sumitadutta953-ops/stellar-circles/actions/workflows/cd.yml" target="_blank" rel="noopener">
+          <img src="https://github.com/sumitadutta953-ops/stellar-circles/actions/workflows/cd.yml/badge.svg" alt="CD Pipeline" />
+        </a>
+        <img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License: Apache-2.0" />
+        <img src="https://img.shields.io/badge/Network-Stellar%20Testnet-7C3AED" alt="Stellar Testnet" />
+      </div>
+      <div class="hero-actions">
+        <a href="https://stellar-circles.vercel.app" class="btn btn-primary" target="_blank" rel="noopener">
+          🚀 Launch App
+        </a>
+        <a href="https://github.com/sumitadutta953-ops/stellar-circles" class="btn btn-secondary" target="_blank" rel="noopener">
+          📦 View on GitHub
+        </a>
+        <a href="#setup" class="btn btn-ghost">
+          📖 Get Started
+        </a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="orbit-ring ring-1">
+        <div class="orbit-dot dot-1">💰</div>
+      </div>
+      <div class="orbit-ring ring-2">
+        <div class="orbit-dot dot-2">🔒</div>
+      </div>
+      <div class="orbit-ring ring-3">
+        <div class="orbit-dot dot-3">⭐</div>
+      </div>
+      <div class="orbit-center">🌀</div>
+    </div>
+  </header>
+
+  <main>
+
+  <!-- PROBLEM / SOLUTION -->
+  <section class="section" id="problem-solution">
+    <div class="container">
+      <div class="two-col">
+        <div class="card card-danger">
+          <div class="card-icon">⚠️</div>
+          <h2 class="card-title">The Problem</h2>
+          <p>In traditional ROSCAs, members must <strong>trust a human organizer</strong> to collect and distribute funds fairly. This creates serious risks:</p>
+          <ul class="bullet-list">
+            <li>Risk of fraud by the organizer</li>
+            <li>Human error in tracking contributions</li>
+            <li>Disputes with no neutral arbiter</li>
+            <li>No transparent audit trail</li>
+          </ul>
+        </div>
+        <div class="card card-success">
+          <div class="card-icon">✅</div>
+          <h2 class="card-title">The Solution</h2>
+          <p>Stellar Circles replaces the human organizer with <strong>Soroban smart contracts</strong>. Every contribution, payout, and membership change is:</p>
+          <ul class="bullet-list">
+            <li>Executed atomically on-chain</li>
+            <li>Publicly auditable on Stellar Explorer</li>
+            <li>Impossible to tamper with</li>
+            <li>Fully trustless — no intermediary needed</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="section section-alt" id="how-it-works">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-eyebrow">User Journey</span>
+        <h2 class="section-title">How It Works</h2>
+        <p class="section-desc">Six simple steps from circle creation to final payout — all enforced by smart contracts.</p>
+      </div>
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-num">01</div>
+          <div class="step-icon">🏗️</div>
+          <h3>Create a Circle</h3>
+          <p>Set the contribution amount (in XLM), cycle length in seconds, and member cap. A unique invite code is generated.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">02</div>
+          <div class="step-icon">🤝</div>
+          <h3>Invite Friends</h3>
+          <p>Share the 6-character invite code with friends. Anyone with the code can join up to the member cap.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">03</div>
+          <div class="step-icon">🚦</div>
+          <h3>Circle Starts</h3>
+          <p>The circle activates automatically on-chain once the member cap is reached. No manual trigger needed.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">04</div>
+          <div class="step-icon">💸</div>
+          <h3>Everyone Contributes</h3>
+          <p>Each cycle, every member sends their XLM share to the contribution vault contract. Funds are held securely on-chain.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">05</div>
+          <div class="step-icon">🏆</div>
+          <h3>Payout Triggered</h3>
+          <p>Once all members have contributed, the payout contract verifies completeness and sends the full pool to that cycle's recipient.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">06</div>
+          <div class="step-icon">🎉</div>
+          <h3>Circle Completes</h3>
+          <p>After every member has received one payout, the circle is marked complete. The process was fully automated and trustless.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LIVE DEMO -->
+  <section class="section" id="live-demo">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-eyebrow">Resources</span>
+        <h2 class="section-title">Live Demo &amp; Resources</h2>
+      </div>
+      <div class="resources-grid">
+        <a href="https://stellar-circles.vercel.app" class="resource-card" target="_blank" rel="noopener">
+          <div class="resource-icon">🌐</div>
+          <div class="resource-info">
+            <h3>Live Application</h3>
+            <p>stellar-circles.vercel.app</p>
+          </div>
+          <span class="resource-arrow">↗</span>
+        </a>
+        <a href="https://drive.google.com/file/d/1xphp1EkNypL4W5do3OBhRWi5JBjoeMR-/view?usp=sharing" class="resource-card" target="_blank" rel="noopener">
+          <div class="resource-icon">🎬</div>
+          <div class="resource-info">
+            <h3>Demo Video</h3>
+            <p>Watch the full walkthrough on Google Drive</p>
+          </div>
+          <span class="resource-arrow">↗</span>
+        </a>
+        <a href="https://stellar.expert/explorer/testnet" class="resource-card" target="_blank" rel="noopener">
+          <div class="resource-icon">🔍</div>
+          <div class="resource-info">
+            <h3>Stellar Expert</h3>
+            <p>View deployed contracts on testnet explorer</p>
+          </div>
+          <span class="resource-arrow">↗</span>
+        </a>
+        <a href="https://github.com/sumitadutta953-ops/stellar-circles" class="resource-card" target="_blank" rel="noopener">
+          <div class="resource-icon">📦</div>
+          <div class="resource-info">
+            <h3>GitHub Repository</h3>
+            <p>Full source code, CI/CD pipelines, and issue tracker</p>
+          </div>
+          <span class="resource-arrow">↗</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ARCHITECTURE -->
+  <section class="section section-alt" id="architecture">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-eyebrow">System Design</span>
+        <h2 class="section-title">Architecture Overview</h2>
+        <p class="section-desc">Three-layer architecture: React frontend → Stellar Soroban smart contracts → Firebase for off-chain metadata.</p>
+      </div>
+
+      <div class="arch-diagram">
+        <div class="arch-layer layer-frontend">
+          <div class="arch-layer-label">Layer 1 — Frontend</div>
+          <div class="arch-layer-title">React + Vite Application</div>
+          <div class="arch-components">
+            <div class="arch-comp comp-page">WalletConnect</div>
+            <div class="arch-comp comp-page">CircleCreation</div>
+            <div class="arch-comp comp-page">CircleDashboard</div>
+            <div class="arch-comp comp-page">JoinCircle</div>
+          </div>
+          <div class="arch-services-title">Services</div>
+          <div class="arch-components">
+            <div class="arch-comp comp-service">stellar.ts</div>
+            <div class="arch-comp comp-service">passkey.ts</div>
+            <div class="arch-comp comp-service">db.ts</div>
+            <div class="arch-comp comp-service">analytics.ts</div>
+          </div>
+        </div>
+
+        <div class="arch-arrow">
+          <div class="arch-arrow-label">@stellar/stellar-sdk — TransactionBuilder → prepareTransaction → sendTransaction</div>
+          <div class="arch-arrow-line">↓</div>
+        </div>
+
+        <div class="arch-layer layer-contracts">
+          <div class="arch-layer-label">Layer 2 — Smart Contracts</div>
+          <div class="arch-layer-title">Stellar Soroban Testnet (RPC)</div>
+          <div class="arch-components">
+            <div class="arch-comp comp-contract">CircleFactory</div>
+            <div class="arch-comp comp-contract">Contribution</div>
+            <div class="arch-comp comp-contract">Payout</div>
+            <div class="arch-comp comp-contract">PasskeyFactory</div>
+            <div class="arch-comp comp-contract">PasskeyWallet</div>
+            <div class="arch-comp comp-contract">Reputation</div>
+            <div class="arch-comp comp-contract">DefaultHandler</div>
+          </div>
+        </div>
+
+        <div class="arch-arrow">
+          <div class="arch-arrow-label">Off-chain metadata (names, codes, tracking)</div>
+          <div class="arch-arrow-line">↓</div>
+        </div>
+
+        <div class="arch-layer layer-firebase">
+          <div class="arch-layer-label">Layer 3 — Off-Chain Storage</div>
+          <div class="arch-layer-title">Firebase Firestore</div>
+          <div class="arch-components">
+            <div class="arch-comp comp-firebase">Circle names &amp; descriptions</div>
+            <div class="arch-comp comp-firebase">Invite codes</div>
+            <div class="arch-comp comp-firebase">Member display names</div>
+            <div class="arch-comp comp-firebase">Status flags &amp; cycle tracking</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTRACTS -->
+  <section class="section" id="contracts">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-eyebrow">Soroban Rust</span>
+        <h2 class="section-title">Smart Contracts</h2>
+        <p class="section-desc">All contracts are written in Rust using Soroban SDK v27. Located in <code>/contracts</code>.</p>
+      </div>
+
+      <div class="contracts-grid">
+
+        <div class="contract-card" id="contract-circle-factory">
+          <div class="contract-header">
+            <div class="contract-icon">🏭</div>
+            <div>
+              <h3 class="contract-name">circle-factory</h3>
+              <span class="contract-role">Registry Contract</span>
+            </div>
+          </div>
+          <p class="contract-desc">The registry contract. Stores <code>CircleConfig</code> structs keyed by a <code>u64</code> circle ID. Entry point for creating any new savings circle.</p>
+          <div class="contract-functions">
+            <div class="fn-item">
+              <code class="fn-sig">create_circle(organizer, asset, contribution_amount: i128, cycle_length_seconds: u64, member_cap: u32) → u64</code>
+              <p class="fn-desc">Creates a new circle on-chain, stores config, returns the new circle ID.</p>
+            </div>
+            <div class="fn-item">
+              <code class="fn-sig">get_circle_info(circle_id: u64) → CircleConfig</code>
+              <p class="fn-desc">Returns the full configuration struct for a given circle.</p>
+            </div>
+            <div class="fn-item">
+              <code class="fn-sig">set_inactive(circle_id: u64, caller: Address)</code>
+              <p class="fn-desc">Marks a circle as inactive. Only the organizer can call this.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="contract-card" id="contract-contribution">
+          <div class="contract-header">
+            <div class="contract-icon">💰</div>
+            <div>
+              <h3 class="contract-name">contribution</h3>
+              <span class="contract-role">Vault &amp; Membership Contract</span>
+            </div>
+          </div>
+          <p class="contract-desc">Handles membership and the contribution/payout vault. <strong>Holds all XLM funds</strong>. The most critical contract in the system.</p>
+          <div class="contract-functions">
+            <div class="fn-item">
+              <code class="fn-sig">join_circle(circle_id: u64, member: Address)</code>
+              <p class="fn-desc">Adds a member to the circle. Called automatically after creation and via invite code.</p>
+            </div>
+            <div class="fn-item">
+              <code class="fn-sig">contribute(circle_id: u64, member: Address)</code>
+              <p class="fn-desc">Member pays their share. Internally calls <code>token::transfer</code> to move XLM into the vault.</p>
+            </div>
+            <div class="fn-item">
+              <code class="fn-sig">leave_circle(circle_id: u64, member: Address)</code>
+              <p class="fn-desc">Removes a member and refunds their current-cycle contribution if already paid.</p>
+            </div>
+            <div class="fn-item">
+              <code class="fn-sig">execute_payout(circle_id: u64, recipient: Address, amount: i128)</code>
+              <p class="fn-desc">Sends the pooled funds to the cycle recipient. Called internally by the Payout contract.</p>
+            </div>
+            <div class="fn-item">
+              <code class="fn-sig">get_members(circle_id: u64) → Vec&lt;Address&gt;</code>
+              <p class="fn-desc">Returns the ordered list of members for a given circle.</p>
+            </div>
+            <div class="fn-item">
+              <code class="fn-sig">has_contributed(circle_id: u64, cycle: u32, member: Address) → bool</code>
+              <p class="fn-desc">Checks if a specific member has paid for a given cycle.</p>
+            </div>
+            <div class="fn-item">
+              <code class="fn-sig">get_current_cycle(circle_id: u64) → u32</code>
+              <p class="fn-desc">Returns the current active cycle number for a circle.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="contract-card" id="contract-payout">
+          <div class="contract-header">
+            <div class="contract-icon">🏆</div>
+            <div>
+              <h3 class="contract-name">payout</h3>
+              <span class="contract-role">Orchestration Contract</span>
+            </div>
+          </div>
+          <p class="contract-desc">Orchestration contract. Verifies all members have contributed then triggers the vault payout. Acts as an on-chain guardian ensuring fairness.</p>
+          <div class="contract-functions">
+            <div class="fn-item">
+              <code class="fn-sig">trigger_payout(circle_id: u64)</code>
+              <p class="fn-desc">Verifies every member <code>has_contributed</code> for the current cycle, then calls <code>contribution::execute_payout</code> to send the pool to the cycle's recipient.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="contract-card" id="contract-passkey-factory">
+          <div class="contract-header">
+            <div class="contract-icon">🔑</div>
+            <div>
+              <h3 class="contract-name">passkey-factory</h3>
+              <span class="contract-role">Wallet Deployer</span>
+            </div>
+          </div>
+          <p class="contract-desc">Deploys per-user smart wallets tied to WebAuthn passkey credentials. Enables passwordless, seed-phrase-free wallet onboarding.</p>
+          <div class="contract-functions">
+            <div class="fn-item">
+              <code class="fn-sig">init(wallet_wasm_hash: BytesN&lt;32&gt;)</code>
+              <p class="fn-desc">Initializes the factory with the passkey-wallet WASM hash to use for deployments.</p>
+            </div>
+            <div class="fn-item">
+              <code class="fn-sig">deploy_wallet(salt: BytesN&lt;32&gt;, public_key: BytesN&lt;65&gt;) → Address</code>
+              <p class="fn-desc">Deploys a new smart wallet for a user identified by their passkey public key.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="contract-card" id="contract-passkey-wallet">
+          <div class="contract-header">
+            <div class="contract-icon">👛</div>
+            <div>
+              <h3 class="contract-name">passkey-wallet</h3>
+              <span class="contract-role">Per-User Smart Wallet</span>
+            </div>
+          </div>
+          <p class="contract-desc">Smart wallet contract authorized by a passkey public key (P-256 / secp256r1). Each user gets their own deployed instance.</p>
+          <div class="contract-functions">
+            <div class="fn-item">
+              <code class="fn-sig">sign(payload: BytesN&lt;32&gt;, signature: Map&lt;Symbol, Val&gt;) → Val</code>
+              <p class="fn-desc">Verifies a WebAuthn signature against the wallet's stored public key.</p>
+            </div>
+            <div class="fn-item">
+              <code class="fn-sig">add_signer(public_key: BytesN&lt;65&gt;)</code>
+              <p class="fn-desc">Adds an additional passkey signer to the wallet (e.g., recovery device).</p>
+            </div>
+            <div class="fn-item">
+              <code class="fn-sig">remove_signer(public_key: BytesN&lt;65&gt;)</code>
+              <p class="fn-desc">Removes a passkey signer from the wallet.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="contract-card" id="contract-reputation">
+          <div class="contract-header">
+            <div class="contract-icon">⭐</div>
+            <div>
+              <h3 class="contract-name">reputation</h3>
+              <span class="contract-role">On-Chain Reputation</span>
+            </div>
+          </div>
+          <p class="contract-desc">On-chain reputation tracking. Score is incremented with each successful contribution, building a trustworthiness record for members.</p>
+          <div class="contract-functions">
+            <div class="fn-item">
+              <code class="fn-sig">record_contribution(member: Address)</code>
+              <p class="fn-desc">Increments the reputation score for a member after a successful contribution.</p>
+            </div>
+            <div class="fn-item">
+              <code class="fn-sig">get_score(member: Address) → u32</code>
+              <p class="fn-desc">Returns the total reputation score for a given wallet address.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="contract-card" id="contract-default-handler">
+          <div class="contract-header">
+            <div class="contract-icon">🚨</div>
+            <div>
+              <h3 class="contract-name">default-handler</h3>
+              <span class="contract-role">Default Resolution</span>
+            </div>
+          </div>
+          <p class="contract-desc">Handles members who miss a contribution deadline. Protects the group from a single non-contributing member.</p>
+          <div class="contract-functions">
+            <div class="fn-item">
+              <code class="fn-sig">handle_default(circle_id: u64, member: Address)</code>
+              <p class="fn-desc">Processes a member who has defaulted on their contribution, potentially removing them from the circle.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Deployed Addresses Table -->
+      <div class="section-header" style="margin-top: 4rem">
+        <h2 class="section-title">Contract Function Reference</h2>
+        <p class="section-desc">All contracts are deployed to <strong>Stellar Testnet</strong>. Exact IDs are written to <code>frontend/.env</code> by <code>scripts/deploy.ps1</code> after each deployment and can also be found in CI/CD job logs.</p>
+      </div>
+      <div class="table-wrap">
+        <table class="doc-table">
+          <thead>
+            <tr>
+              <th>Contract</th>
+              <th>Purpose</th>
+              <th>Key Functions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>CircleFactory</code></td>
+              <td>Circle registry</td>
+              <td><code>create_circle</code>, <code>get_circle_info</code>, <code>set_inactive</code></td>
+            </tr>
+            <tr>
+              <td><code>Contribution</code></td>
+              <td>Vault &amp; membership</td>
+              <td><code>join_circle</code>, <code>contribute</code>, <code>leave_circle</code>, <code>execute_payout</code></td>
+            </tr>
+            <tr>
+              <td><code>Payout</code></td>
+              <td>Payout orchestration</td>
+              <td><code>trigger_payout</code></td>
+            </tr>
+            <tr>
+              <td><code>PasskeyFactory</code></td>
+              <td>Smart wallet deployer</td>
+              <td><code>deploy_wallet</code></td>
+            </tr>
+            <tr>
+              <td><code>PasskeyWallet</code></td>
+              <td>Per-user smart wallet</td>
+              <td><code>sign</code>, <code>add_signer</code>, <code>remove_signer</code></td>
+            </tr>
+            <tr>
+              <td><code>Reputation</code></td>
+              <td>On-chain reputation</td>
+              <td><code>record_contribution</code>, <code>get_score</code></td>
+            </tr>
+            <tr>
+              <td><code>DefaultHandler</code></td>
+              <td>Missed contribution handling</td>
+              <td><code>handle_default</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- FRONTEND -->
+  <section class="section section-alt" id="frontend">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-eyebrow">React + Vite + TypeScript</span>
+        <h2 class="section-title">Frontend Application</h2>
+        <p class="section-desc">The frontend is a React SPA built with Vite and TypeScript, deployed to Vercel. It communicates with Soroban via <code>@stellar/stellar-sdk</code>.</p>
+      </div>
+
+      <h3 class="subsection-title">Pages</h3>
+      <div class="three-col">
+        <div class="feature-card">
+          <div class="feature-icon">🔌</div>
+          <h4>WalletConnect</h4>
+          <p>Handles both Passkey (WebAuthn) and Freighter wallet connection flows. First screen users see — connects them to Stellar network.</p>
+          <div class="file-badge">components/WalletConnect.tsx</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">➕</div>
+          <h4>CircleCreation</h4>
+          <p>Form to set contribution amount (XLM), cycle length, and member cap. On submit, calls <code>CircleFactory::create_circle</code> then auto-joins.</p>
+          <div class="file-badge">pages/CircleCreation.tsx</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <h4>CircleDashboard</h4>
+          <p>The main circle management view. Shows member list, current cycle, contribution status, and provides Contribute / Leave buttons.</p>
+          <div class="file-badge">pages/CircleDashboard.tsx</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🎟️</div>
+          <h4>JoinCircle</h4>
+          <p>Join an existing circle by entering a 6-character invite code. Calls <code>Contribution::join_circle</code> on-chain.</p>
+          <div class="file-badge">pages/JoinCircle.tsx</div>
+        </div>
+      </div>
+
+      <h3 class="subsection-title" style="margin-top: 3rem">Services</h3>
+      <div class="services-list">
+        <div class="service-item">
+          <div class="service-header">
+            <code class="service-file">stellar.ts</code>
+            <span class="service-badge">Core</span>
+          </div>
+          <p>The backbone of all blockchain interactions. Exports <code>CONTRACT_IDS</code>, <code>buildContractCall()</code>, and <code>submitTransaction()</code>.</p>
+          <p class="service-flow">Flow: <code>Contract</code> → <code>TransactionBuilder</code> → <code>server.prepareTransaction()</code> → <code>server.sendTransaction()</code> → poll <code>server.getTransaction()</code></p>
+        </div>
+        <div class="service-item">
+          <div class="service-header">
+            <code class="service-file">passkey.ts</code>
+            <span class="service-badge">Auth</span>
+          </div>
+          <p>Handles WebAuthn credential creation and authentication. Wraps the browser's <code>navigator.credentials</code> API for passkey login without seed phrases.</p>
+        </div>
+        <div class="service-item">
+          <div class="service-header">
+            <code class="service-file">db.ts</code>
+            <span class="service-badge">Storage</span>
+          </div>
+          <p>Firebase Firestore client. Stores off-chain metadata: circle names, descriptions, invite codes, member display names, and contribution tracking per cycle.</p>
+        </div>
+        <div class="service-item">
+          <div class="service-header">
+            <code class="service-file">analytics.ts</code>
+            <span class="service-badge">Monitoring</span>
+          </div>
+          <p>Integrates PostHog for product analytics (wallet connects, circle creations, contributions, payouts) and Sentry for error monitoring and alerting.</p>
+        </div>
+      </div>
+
+      <h3 class="subsection-title" style="margin-top: 3rem">UI ↔ Contract Function Mapping</h3>
+      <div class="table-wrap">
+        <table class="doc-table">
+          <thead>
+            <tr>
+              <th>UI Action</th>
+              <th>Contract</th>
+              <th>Function Called</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Create Circle button</td>
+              <td><code>CircleFactory</code></td>
+              <td><code>create_circle</code></td>
+            </tr>
+            <tr>
+              <td>Auto-join after creation</td>
+              <td><code>Contribution</code></td>
+              <td><code>join_circle</code></td>
+            </tr>
+            <tr>
+              <td>Join Circle (invite code)</td>
+              <td><code>Contribution</code></td>
+              <td><code>join_circle</code></td>
+            </tr>
+            <tr>
+              <td>Contribute button</td>
+              <td><code>Contribution</code></td>
+              <td><code>contribute</code></td>
+            </tr>
+            <tr>
+              <td>Auto-payout (last contributor)</td>
+              <td><code>Payout</code></td>
+              <td><code>trigger_payout</code></td>
+            </tr>
+            <tr>
+              <td>Leave Circle button</td>
+              <td><code>Contribution</code></td>
+              <td><code>leave_circle</code></td>
+            </tr>
+            <tr>
+              <td>Wallet connect (passkey)</td>
+              <td><code>PasskeyFactory</code></td>
+              <td><em>deploy_wallet via passkey.ts</em></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- SETUP -->
+  <section class="section" id="setup">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-eyebrow">Local Development</span>
+        <h2 class="section-title">Setup &amp; Installation</h2>
+        <p class="section-desc">Get the full project running locally in five steps.</p>
+      </div>
+
+      <h3 class="subsection-title">Prerequisites</h3>
+      <div class="prereqs-grid">
+        <div class="prereq-item">
+          <div class="prereq-icon">🦀</div>
+          <div>
+            <strong>Rust Stable</strong>
+            <p>With <code>wasm32v1-none</code> target: <code>rustup target add wasm32v1-none</code></p>
+          </div>
+        </div>
+        <div class="prereq-item">
+          <div class="prereq-icon">⭐</div>
+          <div>
+            <strong>Stellar CLI</strong>
+            <p><code>cargo install stellar-cli --features opt</code></p>
+          </div>
+        </div>
+        <div class="prereq-item">
+          <div class="prereq-icon">🟢</div>
+          <div>
+            <strong>Node.js v20+</strong>
+            <p>Download from <a href="https://nodejs.org" target="_blank" rel="noopener">nodejs.org</a></p>
+          </div>
+        </div>
+        <div class="prereq-item">
+          <div class="prereq-icon">🔐</div>
+          <div>
+            <strong>Freighter Wallet</strong>
+            <p>Browser extension from <a href="https://freighter.app" target="_blank" rel="noopener">freighter.app</a></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="setup-steps">
+        <div class="setup-step">
+          <div class="setup-step-num">1</div>
+          <div class="setup-step-content">
+            <h3>Clone &amp; Install</h3>
+            <pre class="code-block"><code>git clone https://github.com/sumitadutta953-ops/stellar-circles.git
+cd stellar-circles
+
+# Install frontend dependencies
+cd frontend &amp;&amp; npm install &amp;&amp; cd ..</code></pre>
+          </div>
+        </div>
+
+        <div class="setup-step">
+          <div class="setup-step-num">2</div>
+          <div class="setup-step-content">
+            <h3>Configure Environment</h3>
+            <pre class="code-block"><code>cp frontend/.env.example frontend/.env
+# Fill in VITE_FIREBASE_*, VITE_CIRCLE_FACTORY_ID, etc.</code></pre>
+            <div class="info-box">
+              <strong>Required env vars:</strong> Firebase project config (<code>VITE_FIREBASE_API_KEY</code>, <code>VITE_FIREBASE_AUTH_DOMAIN</code>, <code>VITE_FIREBASE_PROJECT_ID</code>), Soroban RPC URL, and all contract IDs. See <code>frontend/.env.example</code> for the full list.
+            </div>
+          </div>
+        </div>
+
+        <div class="setup-step">
+          <div class="setup-step-num">3</div>
+          <div class="setup-step-content">
+            <h3>Build Smart Contracts</h3>
+            <pre class="code-block"><code>cd contracts
+stellar contract build
+# WASM files output to: contracts/target/wasm32v1-none/release/</code></pre>
+          </div>
+        </div>
+
+        <div class="setup-step">
+          <div class="setup-step-num">4</div>
+          <div class="setup-step-content">
+            <h3>Deploy Contracts to Testnet</h3>
+            <pre class="code-block"><code>cd scripts
+./deploy.ps1   # PowerShell — writes contract IDs to frontend/.env</code></pre>
+            <div class="info-box">
+              Requires a funded Stellar testnet account. The script automatically writes all deployed contract IDs back to <code>frontend/.env</code>.
+            </div>
+          </div>
+        </div>
+
+        <div class="setup-step">
+          <div class="setup-step-num">5</div>
+          <div class="setup-step-content">
+            <h3>Run Frontend Dev Server</h3>
+            <pre class="code-block"><code>cd frontend
+npm run dev    # http://localhost:5173</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTING -->
+  <section class="section section-alt" id="testing">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-eyebrow">Quality Assurance</span>
+        <h2 class="section-title">Testing</h2>
+        <p class="section-desc">Three-tier testing strategy: smart contract unit tests, TypeScript type safety, and full end-to-end browser automation.</p>
+      </div>
+
+      <div class="three-col">
+        <div class="test-card">
+          <div class="test-icon">🦀</div>
+          <h3>Smart Contract Tests</h3>
+          <p>Rust unit and integration tests for all Soroban contracts using the Soroban test SDK.</p>
+          <pre class="code-block"><code>cd contracts
+cargo test --workspace</code></pre>
+        </div>
+        <div class="test-card">
+          <div class="test-icon">🔷</div>
+          <h3>TypeScript / Lint</h3>
+          <p>Full TypeScript type checking and oxlint linting of the React frontend.</p>
+          <pre class="code-block"><code>cd frontend
+npx tsc --noEmit   # type check
+npm run lint       # oxlint</code></pre>
+        </div>
+        <div class="test-card">
+          <div class="test-icon">🎭</div>
+          <h3>End-to-End (Playwright)</h3>
+          <p>Automated browser tests using Playwright Chromium covering key user flows.</p>
+          <pre class="code-block"><code>cd frontend
+npx playwright install --with-deps chromium
+npm run build
+npx playwright test</code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CI/CD -->
+  <section class="section" id="cicd">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-eyebrow">Automation</span>
+        <h2 class="section-title">CI / CD Pipelines</h2>
+        <p class="section-desc">Fully automated pipelines via GitHub Actions — no manual deployments needed.</p>
+      </div>
+
+      <div class="two-col" style="align-items: start">
+        <div>
+          <h3 class="subsection-title">CI — <code>ci.yml</code></h3>
+          <p class="pipeline-desc">Runs on every push and pull request to <code>main</code>. All gates must pass before merging.</p>
+          <div class="pipeline-table">
+            <div class="pipeline-row">
+              <div class="pipeline-gate">🛡️ Rust Security &amp; Quality</div>
+              <div class="pipeline-steps">
+                <span class="pipeline-step">cargo fmt --check</span>
+                <span class="pipeline-step">cargo audit</span>
+                <span class="pipeline-step">cargo clippy -D warnings</span>
+              </div>
+            </div>
+            <div class="pipeline-row">
+              <div class="pipeline-gate">🧪 Rust Test &amp; Build</div>
+              <div class="pipeline-steps">
+                <span class="pipeline-step">Install Stellar CLI</span>
+                <span class="pipeline-step">stellar contract build</span>
+                <span class="pipeline-step">cargo test --workspace</span>
+              </div>
+            </div>
+            <div class="pipeline-row">
+              <div class="pipeline-gate">🔷 Frontend Quality</div>
+              <div class="pipeline-steps">
+                <span class="pipeline-step">npm ci</span>
+                <span class="pipeline-step">npm audit</span>
+                <span class="pipeline-step">tsc --noEmit</span>
+                <span class="pipeline-step">npm run lint</span>
+              </div>
+            </div>
+            <div class="pipeline-row">
+              <div class="pipeline-gate">🏗️ Frontend Build</div>
+              <div class="pipeline-steps">
+                <span class="pipeline-step">npm run build</span>
+              </div>
+            </div>
+            <div class="pipeline-row">
+              <div class="pipeline-gate">🎭 E2E Tests</div>
+              <div class="pipeline-steps">
+                <span class="pipeline-step">Playwright Chromium</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <h3 class="subsection-title">CD — <code>cd.yml</code></h3>
+          <p class="pipeline-desc">Runs on every push to <code>main</code>.</p>
+          <div class="pipeline-table">
+            <div class="pipeline-row">
+              <div class="pipeline-gate">📦 build-contracts</div>
+              <div class="pipeline-steps">
+                <span class="pipeline-step">Always runs</span>
+                <span class="pipeline-step">stellar contract build</span>
+                <span class="pipeline-step">Upload WASM artifacts</span>
+              </div>
+            </div>
+            <div class="pipeline-row">
+              <div class="pipeline-gate">🚀 deploy-contracts</div>
+              <div class="pipeline-steps">
+                <span class="pipeline-step">Manual dispatch or [deploy-contracts] commit</span>
+                <span class="pipeline-step">Deploy all 6 contracts</span>
+                <span class="pipeline-step">Print IDs to logs</span>
+              </div>
+            </div>
+            <div class="pipeline-row">
+              <div class="pipeline-gate">🌐 deploy-frontend</div>
+              <div class="pipeline-steps">
+                <span class="pipeline-step">Always runs</span>
+                <span class="pipeline-step">npm run build</span>
+                <span class="pipeline-step">Vercel production deploy</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ANALYTICS -->
+  <section class="section section-alt" id="analytics">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-eyebrow">Observability</span>
+        <h2 class="section-title">Analytics &amp; Monitoring</h2>
+      </div>
+      <div class="three-col">
+        <div class="analytics-card">
+          <div class="analytics-icon">📊</div>
+          <h3>PostHog</h3>
+          <p>Product analytics tracking wallet connects, circle creations, contributions, payouts, and errors. Provides funnel analysis and retention insights.</p>
+        </div>
+        <div class="analytics-card">
+          <div class="analytics-icon">🚨</div>
+          <h3>Sentry</h3>
+          <p>Real-time error monitoring. Captures frontend exceptions and provides stack traces, user context, and automated alerting.</p>
+        </div>
+        <div class="analytics-card">
+          <div class="analytics-icon">🔗</div>
+          <h3>Stellar Expert</h3>
+          <p>All transactions are publicly visible on the Stellar Expert Testnet Explorer — full on-chain audit trail for every contribution and payout.</p>
+          <a href="https://stellar.expert/explorer/testnet" class="analytics-link" target="_blank" rel="noopener">View Explorer ↗</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTRIBUTING -->
+  <section class="section" id="contributing">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-eyebrow">Open Source</span>
+        <h2 class="section-title">Contributing</h2>
+        <p class="section-desc">Stellar Circles is open source under Apache 2.0. Contributions are welcome!</p>
+      </div>
+
+      <div class="two-col" style="align-items: start">
+        <div>
+          <h3 class="subsection-title">Smart Contracts (Rust)</h3>
+          <ol class="ordered-list">
+            <li>Edit the relevant contract in <code>contracts/&lt;name&gt;/src/lib.rs</code></li>
+            <li>Build: <code>cd contracts &amp;&amp; stellar contract build</code></li>
+            <li>Test: <code>cargo test --workspace</code></li>
+            <li>Lint: <code>cargo clippy --all-targets -- -D warnings</code></li>
+            <li>Format: <code>cargo fmt --all</code></li>
+          </ol>
+
+          <h3 class="subsection-title" style="margin-top: 2rem">Frontend (TypeScript/React)</h3>
+          <ol class="ordered-list">
+            <li>Edit files in <code>frontend/src/</code></li>
+            <li>Type-check: <code>npx tsc --noEmit</code></li>
+            <li>Lint: <code>npm run lint</code></li>
+            <li>Build: <code>npm run build</code></li>
+          </ol>
+        </div>
+        <div>
+          <h3 class="subsection-title">Commit Convention</h3>
+          <p>Use <a href="https://www.conventionalcommits.org/" target="_blank" rel="noopener">Conventional Commits</a>:</p>
+          <pre class="code-block"><code>feat(contracts): add reputation scoring
+fix(frontend): handle Freighter rejection
+ci: add cargo-audit security scanning
+docs: update contract reference in README
+chore: bump soroban-sdk to v28</code></pre>
+
+          <h3 class="subsection-title" style="margin-top: 2rem">Acknowledgements</h3>
+          <ul class="ack-list">
+            <li>🌟 <a href="https://stellar.org" target="_blank" rel="noopener">Stellar Development Foundation</a> — Soroban SDK &amp; Testnet</li>
+            <li>🔌 <a href="https://freighter.app" target="_blank" rel="noopener">Freighter</a> — Browser wallet integration</li>
+            <li>🔑 <a href="https://github.com/kalepail/passkey-kit" target="_blank" rel="noopener">PasskeyKit</a> — WebAuthn + Soroban patterns</li>
+            <li>🔥 <a href="https://firebase.google.com" target="_blank" rel="noopener">Firebase</a> — Off-chain metadata storage</li>
+            <li>📊 <a href="https://posthog.com" target="_blank" rel="noopener">PostHog</a> — Open-source product analytics</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <span class="footer-logo">🌀</span>
+          <span class="footer-name">Stellar Circles</span>
+          <p class="footer-tagline">Trustless rotating savings on Soroban</p>
+        </div>
+        <div class="footer-links-grid">
+          <div class="footer-col">
+            <h4>Documentation</h4>
+            <ul>
+              <li><a href="#overview">Overview</a></li>
+              <li><a href="#how-it-works">How It Works</a></li>
+              <li><a href="#architecture">Architecture</a></li>
+              <li><a href="#contracts">Smart Contracts</a></li>
+            </ul>
+          </div>
+          <div class="footer-col">
+            <h4>Development</h4>
+            <ul>
+              <li><a href="#frontend">Frontend</a></li>
+              <li><a href="#setup">Setup</a></li>
+              <li><a href="#testing">Testing</a></li>
+              <li><a href="#cicd">CI/CD</a></li>
+            </ul>
+          </div>
+          <div class="footer-col">
+            <h4>Links</h4>
+            <ul>
+              <li><a href="https://stellar-circles.vercel.app" target="_blank" rel="noopener">Live App</a></li>
+              <li><a href="https://github.com/sumitadutta953-ops/stellar-circles" target="_blank" rel="noopener">GitHub</a></li>
+              <li><a href="https://stellar.expert/explorer/testnet" target="_blank" rel="noopener">Explorer</a></li>
+              <li><a href="#contributing">Contributing</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2025 Stellar Circles. Apache 2.0 License.</span>
+        <span>Built on <a href="https://stellar.org" target="_blank" rel="noopener">Stellar</a> Soroban</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
